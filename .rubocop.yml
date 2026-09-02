@@ -1,0 +1,17 @@
+plugins:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 4.0
+  Exclude:
+    - ".bundle/**/*"
+    - "coverage/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+
+Style/Documentation:
+  Exclude:
+    - "spec/**/*"
