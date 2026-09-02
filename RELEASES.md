@@ -1,9 +1,10 @@
 # Release Plan
 
-ActiveAdmin React follows capability-gated semantic prereleases. Dates are targets; quality gates control promotion.
+ActiveAdmin React follows capability-gated semantic prereleases. There are no calendar commitments: quality gates, Rodeo dogfooding, community feedback, and ActiveAdmin 4 maturity control promotion.
+
+ActiveAdmin React should track ActiveAdmin 4 closely while AA4 remains prerelease software. Cora should refine this gem whenever Rodeo exposes a generally reusable ActiveAdmin/React integration need, while keeping Rodeo-specific business behavior out of the gem. Generally useful fixes discovered in ActiveAdmin or Arbre should be considered for upstream contribution.
 
 ## 0.1.0.alpha1 — package foundation
-Target: September 2026
 
 - RubyGem skeleton and public API namespace
 - ActiveAdmin 4 compatibility declaration
@@ -15,7 +16,6 @@ Target: September 2026
 Exit gate: gem builds in CI and can be published through OIDC Trusted Publishing.
 
 ## 0.1.0.alpha2 — Arbre mount primitive
-Target: September 2026
 
 - `react_component` Arbre builder
 - deterministic mount-point markup
@@ -27,7 +27,6 @@ Target: September 2026
 Exit gate: mount primitive works in an ActiveAdmin 4 dummy application with request/system coverage.
 
 ## 0.1.0.alpha3 — JavaScript runtime adapters
-Target: late September / early October 2026
 
 - React 18/19 compatibility policy
 - mount/unmount lifecycle
@@ -39,7 +38,6 @@ Target: late September / early October 2026
 Exit gate: no leaked roots across Turbo/AA navigation and documented host integration.
 
 ## 0.1.0.alpha4 — asynchronous components
-Target: October 2026
 
 - Action Cable integration helper
 - progress/status event contract
@@ -51,7 +49,6 @@ Target: October 2026
 Exit gate: reference async operation survives reconnects, retries, duplicate events, and navigation.
 
 ## 0.1.0.alpha5 — engine/plugin integration
-Target: October 2026
 
 - engine-provided component discovery
 - namespaced component registries
@@ -62,7 +59,6 @@ Target: October 2026
 Exit gate: two independent Rails engines contribute components without host knowledge of their internals.
 
 ## 0.2.0.beta1 — real-world integration
-Target: November 2026
 
 - production use in Rodeo ActiveAdmin 4
 - performance instrumentation
@@ -73,7 +69,6 @@ Target: November 2026
 Exit gate: sustained Rodeo usage with no known critical lifecycle, security, or memory issues.
 
 ## 0.2.0.beta2+ — ecosystem hardening
-Target: November–December 2026
 
 - community feedback
 - additional asset/bundler adapters based on demand
@@ -85,7 +80,6 @@ Target: November–December 2026
 Exit gate: API changes become exceptional and documented.
 
 ## 0.9.0.rc1 — 1.0 contract freeze
-Target: Q1 2027
 
 - public Ruby API frozen
 - JavaScript adapter protocol frozen
@@ -93,13 +87,15 @@ Target: Q1 2027
 - upgrade guide
 - complete reference application
 - release provenance and package verification documented
+- compatibility verified against stable ActiveAdmin 4, unless the project explicitly documents why release-candidate status is appropriate before AA4 stable
 
-Exit gate: only release-blocking defects may change public contracts.
+Exit gate: ActiveAdmin 4 compatibility is understood against its stable API surface and only release-blocking defects may change ActiveAdmin React public contracts.
 
 ## 1.0.0 — stable
-Target: Q1 2027
 
 Stable support for optional React islands in ActiveAdmin while preserving a Rails-first, server-rendered architecture.
+
+ActiveAdmin React 1.0 should normally follow ActiveAdmin 4 stable rather than racing ahead of its primary host framework. The project may continue shipping useful alpha and beta releases while AA4 itself is in beta.
 
 ### 1.0 guarantees
 
