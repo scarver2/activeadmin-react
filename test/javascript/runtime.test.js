@@ -55,6 +55,12 @@ describe("React runtime", () => {
     expect(() => mountElement(element)).toThrow("Unknown React component: MissingTable")
   })
 
+  it("rejects malformed props", () => {
+    const element = mountNode("not-json")
+
+    expect(() => mountElement(element)).toThrow(SyntaxError)
+  })
+
   it("unmounts one element and ignores an unmounted element", async () => {
     const element = mountNode()
     mountElement(element)

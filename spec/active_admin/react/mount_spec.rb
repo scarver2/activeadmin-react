@@ -35,11 +35,56 @@ RSpec.describe ActiveAdmin::React::Mount do
         'react-props' => '{"filter":"open"}'
       )
     end
+
+    # rubocop:disable-next RSpec/ExampleLength
+    it 'protects reserved data attributes from caller collisions' do
+      mount = described_class.new(
+        'OrdersTable',
+        props: { page: 1 },
+        html: { data: { 'react-component' => 'Wrong', 'react-props' => 'unsafe', controller: 'orders' } }
+      )
+
+      expect(mount.attributes[:data]).to eq(
+        'react-component' => 'OrdersTable',
+        'react-props' => '{"page":1}',
+        controller: 'orders'
+      )
+    end
+
+    # rubocop:disable-next RSpec/ExampleLength
+    it 'normalizes supported props into deterministic JSON' do
+      props = {
+        symbol_key: :ready,
+        boolean: true,
+        decimal: 1.25,
+        date: Date.new(2026, 9, 3),
+        time: Time.utc(2026, 9, 3, 12, 30),
+        nested: [{ 'safe' => '<not executable>' }, nil]
+      }
+
+      attributes = described_class.new('OrdersTable', props: props).attributes
+
+      expect(attributes[:data]['react-props']).to include(
+        '"symbol_key":"ready"',
+        '"date":"2026-09-03"',
+        '"safe":"<not executable>"'
+      )
+    end
   end
 
   it 'exposes the fallback' do
     fallback = -> { 'Loading orders' }
 
     expect(described_class.new('OrdersTable', fallback: fallback).fallback).to be(fallback)
+  end
+
+  # rubocop:disable-next RSpec/ExampleLength, RSpec/MultipleExpectations
+  it 'rejects invalid components, props, and data attributes' do
+    expect { described_class.new('') }.to raise_error(ArgumentError)
+    expect { described_class.new('Orders Table') }.to raise_error(ArgumentError)
+    expect { described_class.new('OrdersTable', props: Object.new) }.to raise_error(ArgumentError)
+    expect { described_class.new('OrdersTable', props: { 1 => 'invalid' }) }.to raise_error(ArgumentError)
+    expect { described_class.new('OrdersTable', props: { value: Float::NAN }) }.to raise_error(ArgumentError)
+    expect { described_class.new('OrdersTable', html: { data: [] }).attributes }.to raise_error(ArgumentError)
   end
 end
