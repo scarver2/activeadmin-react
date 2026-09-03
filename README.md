@@ -14,11 +14,6 @@ contribution. Run it with:
 bundle exec rspec spec/integration/dummy_host_spec.rb
 ```
 
-—
-Stan Carver II
-Made in Texas 🤠
-https://stancarver.com
-
 ## Mount Safety
 
 The react_component helper accepts JSON-compatible props plus Date, DateTime, and Time
@@ -33,3 +28,8 @@ affordance, so the page remains useful without JavaScript. The gem emits no inli
 scripts and does not create CSP nonces. Hosts should serve compiled React assets through
 their normal CSP-aware asset pipeline and keep CSRF tokens in Rails-managed forms or
 meta tags rather than passing them as component props.
+
+—
+Stan Carver II
+Made in Texas 🤠
+https://stancarver.com
