@@ -4,6 +4,8 @@ require 'active_admin'
 require_relative 'react/arbre'
 require_relative 'react/mount'
 require_relative 'react/version'
+require_relative 'react/registry'
+require_relative 'react/contributions'
 
 module ActiveAdmin
   module React
