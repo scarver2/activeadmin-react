@@ -1,10 +1,10 @@
 # Release Plan
 
-ActiveAdmin React follows capability-gated semantic prereleases. There are no calendar commitments: quality gates, Rodeo dogfooding, community feedback, and ActiveAdmin 4 maturity control promotion.
+ActiveAdmin React follows capability-gated semantic releases. There are no calendar commitments: quality gates, Rodeo dogfooding, community feedback, and ActiveAdmin 4 maturity control promotion. The first release is `0.1.0`; compatible follow-up work ships as `0.1.1` patch releases. When a new capability requires a breaking public API change, increment the minor version.
 
 ActiveAdmin React should track ActiveAdmin 4 closely while AA4 remains prerelease software. Cora should refine this gem whenever Rodeo exposes a generally reusable ActiveAdmin/React integration need, while keeping Rodeo-specific business behavior out of the gem. Generally useful fixes discovered in ActiveAdmin or Arbre should be considered for upstream contribution.
 
-## 0.1.0.alpha1 — package foundation
+## 0.1.0 — package foundation
 
 - RubyGem skeleton and public API namespace
 - ActiveAdmin 4 compatibility declaration
@@ -15,7 +15,7 @@ ActiveAdmin React should track ActiveAdmin 4 closely while AA4 remains prereleas
 
 Exit gate: gem builds in CI and can be published through OIDC Trusted Publishing.
 
-## 0.1.0.alpha2 — Arbre mount primitive
+## 0.1.1 — Arbre mount primitive
 
 - `react_component` Arbre builder
 - deterministic mount-point markup
@@ -26,7 +26,7 @@ Exit gate: gem builds in CI and can be published through OIDC Trusted Publishing
 
 Exit gate: mount primitive works in an ActiveAdmin 4 dummy application with request/system coverage.
 
-## 0.1.0.alpha3 — JavaScript runtime adapters
+## 0.1.1 — JavaScript runtime adapters
 
 - React 18/19 compatibility policy
 - mount/unmount lifecycle
@@ -37,7 +37,7 @@ Exit gate: mount primitive works in an ActiveAdmin 4 dummy application with requ
 
 Exit gate: no leaked roots across Turbo/AA navigation and documented host integration.
 
-## 0.1.0.alpha4 — asynchronous components
+## 0.1.1 — asynchronous components
 
 - Action Cable integration helper
 - progress/status event contract
@@ -48,7 +48,7 @@ Exit gate: no leaked roots across Turbo/AA navigation and documented host integr
 
 Exit gate: reference async operation survives reconnects, retries, duplicate events, and navigation.
 
-## 0.1.0.alpha5 — engine/plugin integration
+## 0.1.1 — engine/plugin integration
 
 - engine-provided component discovery
 - namespaced component registries
@@ -58,7 +58,7 @@ Exit gate: reference async operation survives reconnects, retries, duplicate eve
 
 Exit gate: two independent Rails engines contribute components without host knowledge of their internals.
 
-## 0.2.0.beta1 — real-world integration
+## 0.2.0 — real-world integration
 
 - production use in Rodeo ActiveAdmin 4
 - performance instrumentation
@@ -68,7 +68,7 @@ Exit gate: two independent Rails engines contribute components without host know
 
 Exit gate: sustained Rodeo usage with no known critical lifecycle, security, or memory issues.
 
-## 0.2.0.beta2+ — ecosystem hardening
+## 0.2.1+ — ecosystem hardening patches
 
 - community feedback
 - additional asset/bundler adapters based on demand
@@ -79,7 +79,7 @@ Exit gate: sustained Rodeo usage with no known critical lifecycle, security, or 
 
 Exit gate: API changes become exceptional and documented.
 
-## 0.9.0.rc1 — 1.0 contract freeze
+## 0.9.0 — 1.0 contract freeze
 
 - public Ruby API frozen
 - JavaScript adapter protocol frozen
