@@ -1,17 +1,16 @@
+# spec/spec_helper.rb
 # frozen_string_literal: true
 
-require "simplecov"
+require 'simplecov'
 
-SimpleCov.start do
-  enable_coverage :branch
-  add_filter "/spec/"
-end
-
-require "activeadmin/react"
+SimpleCov.start 'rails'
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
+  config.order = :random
   config.expect_with :rspec do |expectations|
     expectations.syntax = :expect
   end
+
+  Kernel.srand config.seed
 end
