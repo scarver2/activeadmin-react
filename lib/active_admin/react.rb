@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'active_admin'
-require_relative 'react/version'
-require_relative 'react/mount'
 require_relative 'react/arbre'
+require_relative 'react/mount'
+require_relative 'react/version'
 
 module ActiveAdmin
   module React
