@@ -24,6 +24,17 @@ describe("React component registry", () => {
     expect(() => registerComponent("OrdersTable", null)).toThrow("name and component are required")
   })
 
+  it("rejects a colliding registration without replacing the original", () => {
+    const original = () => null
+    const replacement = () => null
+    registerComponent("OrdersTable", original)
+
+    expect(() => registerComponent("OrdersTable", replacement)).toThrow(
+      "component already registered: OrdersTable"
+    )
+    expect(resolveComponent("OrdersTable")).toBe(original)
+  })
+
   it("clears registered components", () => {
     registerComponent("OrdersTable", () => null)
 

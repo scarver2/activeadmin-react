@@ -7,6 +7,7 @@ import {
   mountElement,
   registerComponent,
   start,
+  stop,
   unmountAll,
   unmountElement
 } from "../../app/javascript/active_admin/react/index.js"
@@ -23,6 +24,7 @@ function mountNode(props) {
 
 describe("React runtime", () => {
   beforeEach(() => {
+    stop()
     document.body.innerHTML = ""
     clearComponents()
     registerComponent("OrdersTable", component)
@@ -46,6 +48,16 @@ describe("React runtime", () => {
       expect(first.querySelector("[data-testid=orders]")).toBeTruthy()
       expect(second.querySelector("[data-testid=orders]")).toBeTruthy()
     })
+  })
+
+  it("mounts and unmounts a root element passed directly", async () => {
+    const element = mountNode()
+
+    mountAll(element)
+    await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeTruthy())
+
+    unmountAll(element)
+    await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeNull())
   })
 
   it("rejects unknown components", () => {
@@ -94,5 +106,27 @@ describe("React runtime", () => {
 
     document.dispatchEvent(new Event("turbo:load"))
     await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeTruthy())
+  })
+
+  it("does not accumulate lifecycle listeners when started repeatedly", async () => {
+    const element = mountNode()
+    const addEventListener = vi.spyOn(document, "addEventListener")
+
+    start()
+    start()
+    document.dispatchEvent(new Event("turbo:before-cache"))
+
+    await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeNull())
+    expect(addEventListener.mock.calls.filter(([event]) => event === "turbo:load")).toHaveLength(1)
+    expect(addEventListener.mock.calls.filter(([event]) => event === "turbo:before-cache")).toHaveLength(1)
+  })
+
+  it("stops lifecycle listeners and unmounts tracked roots", async () => {
+    const element = mountNode()
+    start()
+    stop()
+
+    document.dispatchEvent(new Event("turbo:load"))
+    await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeNull())
   })
 })
