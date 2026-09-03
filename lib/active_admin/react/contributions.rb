@@ -2,6 +2,7 @@
 
 module ActiveAdmin
   module React
+    # Coordinates engine-owned React component contributions.
     module Contributions
       module_function
 

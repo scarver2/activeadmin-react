@@ -2,6 +2,7 @@
 
 module ActiveAdmin
   module React
+    # Stores namespaced component contributions with immutable metadata.
     class Registry
       Entry = Data.define(:name, :source, :owner, :metadata)
 
@@ -20,8 +21,8 @@ module ActiveAdmin
         @entries.fetch(name.to_s)
       end
 
-      def each(&block)
-        @entries.values.each(&block)
+      def each(&)
+        @entries.values.each(&)
       end
 
       def to_a
