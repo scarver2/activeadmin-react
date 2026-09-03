@@ -15,12 +15,15 @@ group :development do
 end
 
 group :test do
+  gem 'capybara', '~> 3.40', require: false
   gem 'fakefs', '~> 3.0', require: false
   gem 'rspec', '~> 3.13', require: false
   gem 'simplecov', '~> 0.22', require: false
+  gem 'sqlite3', '~> 2.9', require: false
 end
 
 group :development, :test do
+  gem 'importmap-rails', '~> 2.2', require: false
   gem 'rake', '~> 13.0', require: false
   gem 'rubocop', '~> 1.81', require: false
   gem 'rubocop-performance', '~> 1.26', require: false

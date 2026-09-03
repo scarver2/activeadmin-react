@@ -1,0 +1,5 @@
+# spec/dummy/config/database.yml
+
+test:
+  adapter: sqlite3
+  database: ':memory:'
