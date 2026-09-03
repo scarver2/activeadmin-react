@@ -5,8 +5,11 @@ require 'spec_helper'
 
 require 'active_admin/react/arbre'
 require 'active_admin/react/mount'
+require_relative '../../fixtures/react_mount_attributes'
 
 RSpec.describe ActiveAdmin::React::Arbre do
+  include ReactMountAttributes
+
   let(:host_class) do
     Class.new do
       include ActiveAdmin::React::Arbre
@@ -30,14 +33,7 @@ RSpec.describe ActiveAdmin::React::Arbre do
   end
 
   let(:host) { host_class.new }
-  let(:mount_attributes) do
-    {
-      data: {
-        'react-component' => 'OrdersTable',
-        'react-props' => '{"page":1}'
-      }
-    }
-  end
+  let(:mount_attributes) { react_mount_attributes(page: 1) }
 
   it 'renders a callable fallback inside the mount' do
     result = host.react_component('OrdersTable', props: { page: 1 }, fallback: -> { 'Loading' })
