@@ -4,6 +4,7 @@ require 'json'
 
 module ActiveAdmin
   module React
+    # Builds immutable HTML attributes for a React island and retains its fallback.
     class Mount
       DATA_COMPONENT = 'react-component'
       DATA_PROPS = 'react-props'
