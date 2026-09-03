@@ -35,11 +35,13 @@ RSpec.describe ActiveAdmin::React::Arbre do
   let(:host) { host_class.new }
   let(:mount_attributes) { react_mount_attributes(page: 1) }
 
+  # rubocop:disable-next RSpec/MultipleExpectations
   it 'renders a callable fallback inside the mount' do
     result = host.react_component('OrdersTable', props: { page: 1 }, fallback: -> { 'Loading' })
 
     expect(result).to be(host)
     expect(host.attributes).to include(mount_attributes)
+    expect(host.attributes).to include('aria-live' => 'polite', 'role' => 'status')
     expect(host.nodes).to eq(['Loading'])
   end
 
@@ -47,5 +49,18 @@ RSpec.describe ActiveAdmin::React::Arbre do
     host.react_component('OrdersTable', fallback: 'Loading')
 
     expect(host.nodes).to be_empty
+  end
+
+  # rubocop:disable-next RSpec/ExampleLength
+  it 'preserves caller accessibility attributes' do
+    host.react_component(
+      'OrdersTable',
+      fallback: -> { 'Loading' },
+      role: 'region',
+      'aria-live': 'assertive'
+    )
+
+    expect(host.attributes[:'aria-live']).to eq('assertive')
+    expect(host.attributes[:role]).to eq('region')
   end
 end
