@@ -6,7 +6,7 @@ guard :rubocop, cli: ['-A'] do
   watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |match| File.dirname(match[0]) }
 end
 
-guard :rspec do
+guard :rspec, cmd: 'mise exec -- bundle exec rspec' do
   watch(%r{^spec/(.+)_spec\.rb$})
   watch(%r{^spec/spec_helper\.rb$}) { 'spec' }
   watch(%r{^lib/(.+)\.rb$}) { |match| "spec/#{match[1]}_spec.rb" }
