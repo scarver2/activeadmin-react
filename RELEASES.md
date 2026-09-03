@@ -26,7 +26,7 @@ Exit gate: gem builds in CI and can be published through OIDC Trusted Publishing
 
 Exit gate: mount primitive works in an ActiveAdmin 4 dummy application with request/system coverage.
 
-## 0.1.1 — JavaScript runtime adapters
+## 0.1.2 — JavaScript runtime adapters
 
 - React 18/19 compatibility policy
 - mount/unmount lifecycle
@@ -37,7 +37,7 @@ Exit gate: mount primitive works in an ActiveAdmin 4 dummy application with requ
 
 Exit gate: no leaked roots across Turbo/AA navigation and documented host integration.
 
-## 0.1.1 — asynchronous components
+## 0.1.3 — asynchronous components
 
 - Action Cable integration helper
 - progress/status event contract
@@ -48,7 +48,7 @@ Exit gate: no leaked roots across Turbo/AA navigation and documented host integr
 
 Exit gate: reference async operation survives reconnects, retries, duplicate events, and navigation.
 
-## 0.1.1 — engine/plugin integration
+## 0.1.4 — engine/plugin integration
 
 - engine-provided component discovery
 - namespaced component registries
