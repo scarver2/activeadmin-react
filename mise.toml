@@ -1,0 +1,4 @@
+# mise.toml
+
+[tools]
+node = "24.20.0"

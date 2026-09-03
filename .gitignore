@@ -56,3 +56,6 @@ build-iPhoneSimulator/
 # .rubocop-https?--*
 
 Gemfile.lock
+
+# JavaScript test dependencies.
+node_modules/
