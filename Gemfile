@@ -25,6 +25,7 @@ end
 group :development, :test do
   gem 'importmap-rails', '~> 2.2', require: false
   gem 'rake', '~> 13.0', require: false
+  gem 'rbs', '~> 4.0', require: false
   gem 'rubocop', '~> 1.81', require: false
   gem 'rubocop-performance', '~> 1.26', require: false
   gem 'rubocop-rake', '~> 0.6', require: false

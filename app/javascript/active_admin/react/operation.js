@@ -1,6 +1,6 @@
 // app/javascript/active_admin/react/operation.js
 
-import { normalizeEvent, TERMINAL_OPERATION_STATES } from "./protocol"
+import { normalizeEvent, TERMINAL_OPERATION_STATES } from "./protocol.js"
 
 export class OperationState {
   constructor(initial = {}) {

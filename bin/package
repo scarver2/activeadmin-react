@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# bin/package
+
+source "$(dirname "$0")/_lib.sh"
+
+version="$(run ruby -Ilib -ractive_admin/react/version -e 'print ActiveAdmin::React::VERSION')"
+package_dir="$ROOT_DIR/pkg"
+package_file="$package_dir/activeadmin-react-${version}.gem"
+install_dir="$(mktemp -d)"
+trap 'rm -rf -- "$install_dir"' EXIT
+
+mkdir -p "$package_dir"
+
+say "Building $package_file"
+run gem build activeadmin-react.gemspec --output "$package_file"
+
+say "Inspecting packaged files"
+run ruby "$BIN_DIR/verify-package.rb" "$package_file"
+
+say "Installing the built gem into an isolated GEM_HOME"
+run gem install "$package_file" --install-dir "$install_dir/gems" --no-document
+
+say "Loading the installed gem in a clean Rails process"
+if [[ -n "$MISE_BIN" ]]; then
+  GEM_HOME="$install_dir/gems" GEM_PATH="$install_dir/gems" "$MISE_BIN" exec -- \
+    ruby -e 'require "rails/all"; require "active_admin/react"; puts ActiveAdmin::React::VERSION'
+else
+  GEM_HOME="$install_dir/gems" GEM_PATH="$install_dir/gems" \
+    ruby -e 'require "rails/all"; require "active_admin/react"; puts ActiveAdmin::React::VERSION'
+fi
+
+say "Package verification complete"

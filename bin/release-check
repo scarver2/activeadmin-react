@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# bin/release-check
+
+source "$(dirname "$0")/_lib.sh"
+
+[[ -z "$(git status --porcelain)" ]] || fail "release checks require a clean working tree"
+[[ "$(git branch --show-current)" == "master" ]] || fail "release checks must run from master"
+[[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/master)" ]] || fail "master must match origin/master"
+
+version="$(run ruby -Ilib -ractive_admin/react/version -e 'print ActiveAdmin::React::VERSION')"
+tag="v${version}"
+git rev-parse --verify --quiet "refs/tags/$tag" >/dev/null && fail "tag already exists: $tag"
+
+"$BIN_DIR/test"
+"$BIN_DIR/package"
+
+say "Dry run passed; reviewed master may be tagged $tag"
+say "No gem was published"

@@ -1,3 +1,5 @@
+# .github/workflows/release.yml
+
 name: Release gem
 
 on:
@@ -6,7 +8,34 @@ on:
       - "v*"
 
 jobs:
+  verify:
+    name: Verify release tag
+    if: github.repository == 'scarver2/activeadmin-react'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 4.0.6
+          bundler-cache: true
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - run: npm ci
+      - run: bin/verify-release-tag
+      - run: bin/test
+      - run: bin/package
+
   release:
+    name: Publish gem
+    if: github.repository == 'scarver2/activeadmin-react'
+    needs: verify
     runs-on: ubuntu-latest
     environment: release
     permissions:
@@ -18,6 +47,6 @@ jobs:
           persist-credentials: false
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: ruby
+          ruby-version: 4.0.6
           bundler-cache: true
       - uses: rubygems/release-gem@v1
