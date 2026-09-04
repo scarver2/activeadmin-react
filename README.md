@@ -6,7 +6,7 @@ This repository is being bootstrapped through stacked pull requests. The project
 
 ## Integration Host
 
-The Rails/ActiveAdmin 4 dummy host proves the gem installation and beta1 integration path,
+The Rails/ActiveAdmin 4 dummy host proves the gem installation and pre-1.0 integration path,
 including multiple islands, server fallback, navigation remounts, and a public engine
 contribution. Run it with:
 
