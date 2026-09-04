@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# bin/test
+
+source "$(dirname "$0")/_lib.sh"
+
+say "Running Ruby, RBS, lint, integration, and JavaScript checks"
+run bundle exec rake
