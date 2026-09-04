@@ -3,7 +3,7 @@
 
 module ActiveAdmin
   module React
-    # Stores namespaced component contributions with immutable metadata.
+    # Stores namespaced component contributions with copied, immutable metadata.
     class Registry
       include Enumerable
 
@@ -63,8 +63,31 @@ module ActiveAdmin
           source: normalize_attribute(attributes, :source),
           owner: normalize_attribute(attributes, :owner),
           surfaces: normalize_surfaces(surfaces),
-          metadata: attributes.freeze
+          metadata: immutable_metadata(attributes)
         ).freeze
+      end
+
+      def immutable_metadata(value)
+        return immutable_hash(value) if value.is_a?(Hash)
+        return immutable_array(value) if value.is_a?(Array)
+        return immutable_set(value) if value.is_a?(Set)
+        return value.dup.freeze if value.is_a?(String)
+
+        value
+      end
+
+      def immutable_hash(value)
+        value.each_with_object({}) do |(key, nested_value), copy|
+          copy[immutable_metadata(key)] = immutable_metadata(nested_value)
+        end.freeze
+      end
+
+      def immutable_array(value)
+        value.map { |nested_value| immutable_metadata(nested_value) }.freeze
+      end
+
+      def immutable_set(value)
+        value.each_with_object(Set.new) { |nested_value, copy| copy << immutable_metadata(nested_value) }.freeze
       end
 
       def normalize_attribute(attributes, field)
