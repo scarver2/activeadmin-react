@@ -92,7 +92,9 @@ module ActiveAdmin
       end
 
       def immutable_set(value, ancestors)
-        value.each_with_object(Set.new) { |nested_value, copy| copy << immutable_metadata(nested_value, ancestors) }.freeze
+        value.each_with_object(Set.new) do |nested_value, copy|
+          copy << immutable_metadata(nested_value, ancestors)
+        end.freeze
       end
 
       def metadata_container?(value)
