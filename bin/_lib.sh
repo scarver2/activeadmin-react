@@ -13,6 +13,9 @@ if [[ -z "$MISE_BIN" ]] && command -v mise >/dev/null 2>&1; then
 elif [[ -z "$MISE_BIN" && -x "${HOME}/.local/bin/mise" ]]; then
   MISE_BIN="${HOME}/.local/bin/mise"
 fi
+if [[ -n "$MISE_BIN" ]]; then
+  export PATH="$(dirname "$MISE_BIN"):$PATH"
+fi
 
 cd "$ROOT_DIR"
 
