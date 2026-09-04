@@ -3,7 +3,7 @@
 
 module ActiveAdmin
   module React
-    # Stores namespaced component contributions with immutable metadata.
+    # Stores namespaced component contributions with copied, immutable metadata.
     class Registry
       include Enumerable
 
@@ -63,8 +63,42 @@ module ActiveAdmin
           source: normalize_attribute(attributes, :source),
           owner: normalize_attribute(attributes, :owner),
           surfaces: normalize_surfaces(surfaces),
-          metadata: attributes.freeze
+          metadata: immutable_metadata(attributes)
         ).freeze
+      end
+
+      def immutable_metadata(value, ancestors = Set.new)
+        return value.dup.freeze if value.is_a?(String)
+        return value unless metadata_container?(value)
+
+        object_id = value.object_id
+        raise ActiveAdmin::React::Error, 'metadata must not contain cyclic containers' if ancestors.include?(object_id)
+
+        nested_ancestors = ancestors.dup.add(object_id)
+        return immutable_hash(value, nested_ancestors) if value.is_a?(Hash)
+        return immutable_array(value, nested_ancestors) if value.is_a?(Array)
+
+        immutable_set(value, nested_ancestors)
+      end
+
+      def immutable_hash(value, ancestors)
+        value.each_with_object({}) do |(key, nested_value), copy|
+          copy[immutable_metadata(key, ancestors)] = immutable_metadata(nested_value, ancestors)
+        end.freeze
+      end
+
+      def immutable_array(value, ancestors)
+        value.map { |nested_value| immutable_metadata(nested_value, ancestors) }.freeze
+      end
+
+      def immutable_set(value, ancestors)
+        value.each_with_object(Set.new) do |nested_value, copy|
+          copy << immutable_metadata(nested_value, ancestors)
+        end.freeze
+      end
+
+      def metadata_container?(value)
+        value.is_a?(Hash) || value.is_a?(Array) || value.is_a?(Set)
       end
 
       def normalize_attribute(attributes, field)

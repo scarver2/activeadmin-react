@@ -73,7 +73,10 @@ coupling the core gem to an application. Component names remain globally unique 
 the browser registry is global; a conflict raises an error naming both owners, namespaces,
 and sources. Enumeration and `diagnostics` sort by namespace, component name, and owner so
 results do not depend on Rails engine load order. Hosts may call `registered?` to make a
-`to_prepare` installer idempotent and `reset!` to isolate tests.
+`to_prepare` installer idempotent and `reset!` to isolate tests. Metadata hashes, arrays,
+sets, and strings are recursively copied and frozen during registration, so later changes
+to caller-owned values cannot alter registered state and diagnostics cannot mutate it.
+Other metadata values must be immutable objects supplied by the contributor.
 
 ## Asynchronous Operations
 

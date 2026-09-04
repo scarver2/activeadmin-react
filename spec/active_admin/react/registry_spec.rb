@@ -37,6 +37,59 @@ RSpec.describe ActiveAdmin::React::Registry do
       expect(entry.metadata).to be_frozen
     end
 
+    it 'copies and deeply freezes supported metadata without mutating caller-owned values' do
+      label = +'Priority'
+      filters = [{ statuses: Set.new(%w[open pending]) }]
+      configuration = { filters:, label: }
+
+      entry = register(:orders, configuration:)
+      registered_configuration = entry.metadata.fetch(:configuration)
+
+      expect(registered_configuration).to eq(configuration)
+      expect(registered_configuration).not_to be(configuration)
+      expect(registered_configuration.fetch(:filters)).not_to be(filters)
+      expect(registered_configuration.fetch(:filters).first).not_to be(filters.first)
+      expect(registered_configuration.dig(:filters, 0, :statuses)).not_to be(filters.first.fetch(:statuses))
+      expect(registered_configuration.fetch(:label)).not_to be(label)
+
+      expect(registered_configuration).to be_frozen
+      expect(registered_configuration.fetch(:filters)).to be_frozen
+      expect(registered_configuration.fetch(:filters).first).to be_frozen
+      expect(registered_configuration.dig(:filters, 0, :statuses)).to be_frozen
+      expect(registered_configuration.fetch(:label)).to be_frozen
+
+      expect(configuration).not_to be_frozen
+      expect(filters).not_to be_frozen
+      expect(filters.first).not_to be_frozen
+      expect(filters.first.fetch(:statuses)).not_to be_frozen
+      expect(label).not_to be_frozen
+
+      filters.first.fetch(:statuses) << 'closed'
+      label << ' orders'
+
+      expect(registered_configuration.dig(:filters, 0, :statuses)).to contain_exactly('open', 'pending')
+      expect(registered_configuration.fetch(:label)).to eq('Priority')
+    end
+
+    it 'rejects cyclic supported metadata containers with a clear error' do
+      items = []
+      items << items
+
+      expect { register(:orders, items:) }.to raise_error(
+        ActiveAdmin::React::Error,
+        'metadata must not contain cyclic containers'
+      )
+    end
+
+    it 'allows shared non-cyclic metadata references' do
+      shared = ['open']
+      entry = register(:orders, primary: shared, secondary: shared)
+
+      expect(entry.metadata.fetch(:primary)).to eq(['open'])
+      expect(entry.metadata.fetch(:secondary)).to eq(['open'])
+      expect(entry.metadata.fetch(:primary)).not_to be(entry.metadata.fetch(:secondary))
+    end
+
     it 'rejects duplicate ownership with actionable diagnostics' do
       register(:orders)
 
@@ -87,7 +140,12 @@ RSpec.describe ActiveAdmin::React::Registry do
   end
 
   it 'provides immutable host diagnostics' do
-    register(:orders, surfaces: %i[panel component], description: 'Orders')
+    register(
+      :orders,
+      surfaces: %i[panel component],
+      description: 'Orders',
+      display: { columns: [%w[id number]], formats: Set.new(%w[compact detailed]) }
+    )
 
     expect(registry.diagnostics).to eq(
       [
@@ -97,12 +155,24 @@ RSpec.describe ActiveAdmin::React::Registry do
           owner: 'CommerceEngine',
           source: 'commerce_engine/active_admin_react',
           surfaces: %i[component panel],
-          metadata: { description: 'Orders' }
+          metadata: {
+            description: 'Orders',
+            display: { columns: [%w[id number]], formats: Set.new(%w[compact detailed]) }
+          }
         }
       ]
     )
-    expect(registry.diagnostics).to be_frozen
-    expect(registry.diagnostics.first).to be_frozen
+    diagnostics = registry.diagnostics
+
+    expect(diagnostics).to be_frozen
+    expect(diagnostics.first).to be_frozen
+    expect(diagnostics.dig(0, :metadata)).to be_frozen
+    expect(diagnostics.dig(0, :metadata, :display)).to be_frozen
+    expect(diagnostics.dig(0, :metadata, :display, :columns)).to be_frozen
+    expect(diagnostics.dig(0, :metadata, :display, :columns, 0)).to be_frozen
+    expect(diagnostics.dig(0, :metadata, :display, :formats)).to be_frozen
+    expect { diagnostics.dig(0, :metadata, :display, :columns, 0) << 'status' }.to raise_error(FrozenError)
+    expect { diagnostics.dig(0, :metadata, :display, :formats) << 'wide' }.to raise_error(FrozenError)
   end
 end
 
