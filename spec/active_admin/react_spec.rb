@@ -10,7 +10,7 @@ RSpec.describe ActiveAdmin::React do
     expect(described_class::Error).to be < StandardError
   end
 
-  it 'exposes a prerelease version' do
-    expect(ActiveAdmin::React::VERSION).to match(/\A\d+\.\d+\.\d+\.alpha\d+\z/)
+  it 'exposes the current pre-1.0 version' do
+    expect(ActiveAdmin::React::VERSION).to eq('0.1.0')
   end
 end
