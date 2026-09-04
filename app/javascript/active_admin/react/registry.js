@@ -2,7 +2,11 @@ const components = new Map()
 
 export function registerComponent(name, component) {
   if (!name || !component) throw new Error("name and component are required")
-  components.set(String(name), component)
+
+  const key = String(name)
+  if (components.has(key)) throw new Error(`component already registered: ${key}`)
+
+  components.set(key, component)
 }
 
 export function resolveComponent(name) {

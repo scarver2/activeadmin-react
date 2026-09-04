@@ -2,8 +2,23 @@ import React from "react"
 import { createRoot } from "react-dom/client"
 import { resolveComponent } from "./registry"
 
-const roots = new WeakMap()
+const roots = new Map()
 const selector = "[data-react-component]"
+let started = false
+
+function elementsWithin(root) {
+  const elements = [...root.querySelectorAll(selector)]
+  if (typeof root.matches === "function" && root.matches(selector)) elements.unshift(root)
+  return elements
+}
+
+function mountOnTurboLoad() {
+  mountAll()
+}
+
+function unmountBeforeTurboCache() {
+  unmountAll()
+}
 
 function propsFor(element) {
   const raw = element.dataset.reactProps || "{}"
@@ -23,7 +38,7 @@ export function mountElement(element) {
 }
 
 export function mountAll(root = document) {
-  root.querySelectorAll(selector).forEach(mountElement)
+  elementsWithin(root).forEach(mountElement)
 }
 
 export function unmountElement(element) {
@@ -34,11 +49,25 @@ export function unmountElement(element) {
 }
 
 export function unmountAll(root = document) {
-  root.querySelectorAll(selector).forEach(unmountElement)
+  for (const element of roots.keys()) {
+    if (root === document || element === root || root.contains(element)) unmountElement(element)
+  }
 }
 
 export function start() {
+  if (started) return
+
   mountAll()
-  document.addEventListener("turbo:load", () => mountAll())
-  document.addEventListener("turbo:before-cache", () => unmountAll())
+  document.addEventListener("turbo:load", mountOnTurboLoad)
+  document.addEventListener("turbo:before-cache", unmountBeforeTurboCache)
+  started = true
+}
+
+export function stop() {
+  if (!started) return
+
+  unmountAll()
+  document.removeEventListener("turbo:load", mountOnTurboLoad)
+  document.removeEventListener("turbo:before-cache", unmountBeforeTurboCache)
+  started = false
 }

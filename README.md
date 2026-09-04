@@ -29,6 +29,19 @@ scripts and does not create CSP nonces. Hosts should serve compiled React assets
 their normal CSP-aware asset pipeline and keep CSRF tokens in Rails-managed forms or
 meta tags rather than passing them as component props.
 
+## JavaScript Runtime
+
+The JavaScript entrypoint is intentionally bundler-neutral. Import the public API from
+`active_admin/react` through the host's normal importmap, esbuild, Vite, or other asset
+entrypoint, register components explicitly, and call `start()` once after the host's
+JavaScript has loaded. The runtime mounts each `[data-react-component]` island, remounts
+after `turbo:load`, and unmounts before Turbo caches a page. `stop()` removes those
+listeners and any tracked roots for hosts that manage their own lifecycle.
+
+The registry rejects duplicate component names so engine contributions cannot silently
+replace one another. Unknown components and malformed props raise without removing the
+server-rendered fallback.
+
 —
 Stan Carver II
 Made in Texas 🤠
