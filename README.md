@@ -25,6 +25,8 @@ mise exec -- bundle exec rspec spec/integration
 ```
 
 `bin/test` includes the dummy ActiveAdmin 4 integration specs through the full RSpec suite.
+`bin/package` builds the gem, verifies its exact contents, installs it with dependencies in
+an isolated gem home, and proves Rails loads the installed copy. It never publishes.
 
 ## Integration Host
 
