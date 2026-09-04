@@ -1,37 +1,84 @@
-export function subscribeToOperation({ consumer, channel, params = {}, onEvent, onConnected, onDisconnected }) {
-  if (!consumer) throw new Error("consumer is required")
-  if (!channel) throw new Error("channel is required")
+// app/javascript/active_admin/react/cable.js
+
+import { normalizeEvent, validateOperationEvent } from "./protocol"
+
+export function subscribeToOperation({
+  consumer,
+  channel,
+  params = {},
+  operationState = null,
+  strict = true,
+  resume = true,
+  onEvent,
+  onIgnoredEvent,
+  onProtocolError,
+  onConnected,
+  onDisconnected,
+  onRejected
+}) {
+  if (!consumer?.subscriptions?.create) throw new Error("consumer is required")
+  if (typeof channel !== "string" || channel.trim().length === 0) throw new Error("channel is required")
 
   const identifier = { channel, ...params }
+  let subscription
 
-  return consumer.subscriptions.create(identifier, {
+  subscription = consumer.subscriptions.create(identifier, {
     connected() {
-      onConnected?.()
+      const resumeFrom = operationState?.lastSequence ?? null
+      if (resume && resumeFrom !== null && typeof subscription?.perform === "function") {
+        subscription.perform("resume", { after_sequence: resumeFrom })
+      }
+      onConnected?.({ resumeFrom })
     },
-    disconnected() {
-      onDisconnected?.()
+    disconnected(details) {
+      onDisconnected?.(details)
+    },
+    rejected() {
+      onRejected?.()
     },
     received(event) {
-      onEvent?.(normalizeEvent(event))
+      try {
+        const normalized = strict ? validateOperationEvent(event) : normalizeEvent(event)
+        const outcome = operationState?.applyEvent(normalized)
+        if (outcome && !outcome.applied) {
+          onIgnoredEvent?.(normalized, outcome.reason)
+          return
+        }
+        onEvent?.(normalized, outcome?.value ?? normalized)
+      } catch (error) {
+        if (onProtocolError) onProtocolError(error, event)
+        else throw error
+      }
     }
   })
+
+  return subscription
 }
 
-export function normalizeEvent(event = {}) {
-  return {
-    id: event.id ?? null,
-    state: event.state ?? "unknown",
-    progress: clampProgress(event.progress),
-    message: event.message ?? null,
-    result: event.result ?? null,
-    error: event.error ?? null,
-    occurredAt: event.occurred_at ?? event.occurredAt ?? null
+export async function requestOperationCancellation({ url, operationId, csrfToken, fetchImpl = globalThis.fetch }) {
+  if (typeof url !== "string" || url.length === 0) throw new Error("url is required")
+  if (typeof operationId !== "string" || operationId.length === 0) throw new Error("operationId is required")
+  if (typeof fetchImpl !== "function") throw new Error("fetch is required")
+
+  const headers = { Accept: "application/json", "Content-Type": "application/json" }
+  if (csrfToken) headers["X-CSRF-Token"] = csrfToken
+
+  const response = await fetchImpl(url, {
+    method: "POST",
+    credentials: "same-origin",
+    headers,
+    body: JSON.stringify({ operation_id: operationId })
+  })
+  const payload = await response.json()
+  if (!response.ok) throw new OperationCancellationError(response.status, payload)
+  return payload
+}
+
+export class OperationCancellationError extends Error {
+  constructor(status, response) {
+    super(`Operation cancellation failed with HTTP ${status}`)
+    this.name = "OperationCancellationError"
+    this.status = status
+    this.response = response
   }
-}
-
-function clampProgress(value) {
-  if (value === null || value === undefined) return null
-  const numeric = Number(value)
-  if (!Number.isFinite(numeric)) return null
-  return Math.min(100, Math.max(0, numeric))
 }

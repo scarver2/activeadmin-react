@@ -42,6 +42,69 @@ The registry rejects duplicate component names so engine contributions cannot si
 replace one another. Unknown components and malformed props raise without removing the
 server-rendered fallback.
 
+## Asynchronous Operations
+
+Action Cable transports operation state; application jobs and services own expensive work.
+Each broadcast uses a monotonic sequence and idempotency key:
+
+```json
+{
+  "operation_id": "report-123",
+  "idempotency_key": "report-123:7",
+  "sequence": 7,
+  "state": "running",
+  "progress": 60,
+  "message": "Rendering pages",
+  "result": null,
+  "result_metadata": null,
+  "error": null,
+  "occurred_at": "2026-09-03T18:42:00Z"
+}
+```
+
+States are `pending`, `queued`, `running`, `retrying`, `completed`, `failed`, and
+`cancelled`; the last three are terminal. `OperationState` ignores duplicate or
+out-of-order events, events for another operation, and all updates after a terminal event.
+Pass it to `subscribeToOperation` so reconnects call the channel's `resume` action with
+the last applied sequence. Strict envelope validation is enabled by default; set
+`strict: false` only while migrating legacy event producers.
+
+```js
+import { OperationState, subscribeToOperation } from "active_admin/react"
+
+const state = new OperationState({ operationId: operationId })
+const subscription = subscribeToOperation({
+  consumer,
+  channel: "OperationsChannel",
+  params: { operation_id: operationId },
+  operationState: state,
+  onEvent: (_event, current) => setOperation(current),
+  onProtocolError: (error) => reportProtocolError(error)
+})
+
+// Return this from a React effect so navigation/unmount removes the subscription.
+return () => subscription.unsubscribe()
+```
+
+On the server, resolve the operation from the authenticated connection and current tenant;
+never trust user or tenant identifiers from subscription parameters. A channel's
+`subscribed` and `resume` actions should authorize the operation, stream its server-owned
+identifier, and transmit the latest snapshot or events after `after_sequence`. Channel
+callbacks must not run the operation itself. The dummy host shows one secure boundary:
+authenticated middleware places server-owned identity and an operation repository in the
+Rack environment, the connection exposes those identifiers, and the channel asks the
+repository for an operation authorized to that user and tenant.
+
+Cancellation is an authenticated application command, not a Cable message.
+`requestOperationCancellation` posts only `operation_id` with same-origin credentials and
+an optional Rails CSRF token. The endpoint must authorize the server-loaded operation,
+request cancellation from the owning job/service, and respond with the updated state.
+
+Use `operationAccessibility(state)` on the visible status container. It returns a polite,
+busy `status` for active work, a polite non-busy status for successful/cancelled terminal
+work, and an assertive `alert` for failures. Keep progress text visible and associate any
+progress bar with its label; color alone must not communicate state.
+
 —
 Stan Carver II
 Made in Texas 🤠
