@@ -1,0 +1,4 @@
+# spec/dummy/config/cable.yml
+
+test:
+  adapter: test
