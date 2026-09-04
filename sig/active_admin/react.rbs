@@ -1,0 +1,32 @@
+# sig/active_admin/react.rbs
+
+module ActiveAdmin
+  module React
+    class Registry
+      class Entry
+        attr_reader name: String
+        attr_reader namespace: String
+        attr_reader source: String
+        attr_reader owner: String
+        attr_reader surfaces: Array[Symbol]
+        attr_reader metadata: Hash[Symbol, untyped]
+      end
+
+      def initialize: () -> void
+      def register: (String | Symbol name, namespace: String | Symbol, source: String | Symbol, owner: untyped, ?surfaces: Array[String | Symbol], **untyped metadata) -> Entry
+      def fetch: (String | Symbol name) -> Entry
+      def each: () { (Entry) -> void } -> Array[Entry]
+              | () -> Enumerator[Entry, Array[Entry]]
+      def to_a: () -> Array[Entry]
+      def registered?: (String | Symbol name) -> bool
+      def diagnostics: () -> Array[Hash[Symbol, untyped]]
+    end
+
+    module Contributions
+      def self.registry: () -> Registry
+      def self.register: (String | Symbol name, namespace: String | Symbol, source: String | Symbol, owner: untyped, ?surfaces: Array[String | Symbol], **untyped metadata) -> Registry::Entry
+      def self.diagnostics: () -> Array[Hash[Symbol, untyped]]
+      def self.reset!: () -> Registry
+    end
+  end
+end
