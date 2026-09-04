@@ -11,6 +11,6 @@ RSpec.describe ActiveAdmin::React do
   end
 
   it 'exposes a prerelease version' do
-    expect(ActiveAdmin::React::VERSION).to match(/\A\d+\.\d+\.\d+\.alpha\d+\z/)
+    expect(Gem::Version.new(ActiveAdmin::React::VERSION)).to be_prerelease
   end
 end

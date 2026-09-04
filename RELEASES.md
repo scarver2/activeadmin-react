@@ -1,6 +1,17 @@
 # Release Plan
 
-ActiveAdmin React follows capability-gated semantic releases. There are no calendar commitments: quality gates, Rodeo dogfooding, community feedback, and ActiveAdmin 4 maturity control promotion. The first release is `0.1.0`; compatible follow-up work ships as `0.1.1` patch releases. When a new capability requires a breaking public API change, increment the minor version.
+ActiveAdmin React follows capability-gated semantic releases. The first integrated public
+prerelease is `0.1.0.beta1`; the numbered capability sections below describe the build
+sequence that beta1 integrates, not separately published versions. Compatible beta fixes
+increment the beta suffix. The stable `0.1.0` follows only after its public contracts are
+ready to leave prerelease status.
+
+## 0.1.0.beta1 — integrated beta
+
+Beta1 combines the package foundation, Arbre mount primitive, JavaScript runtime, async
+operation protocol, and engine contribution contract described below. It must pass the
+complete repository test/coverage/lint gates, package every public Ruby/JavaScript/RBS
+file, install into an isolated gem home, and publish only through reviewed tag-based OIDC.
 
 ActiveAdmin React should track ActiveAdmin 4 closely while AA4 remains prerelease software. Cora should refine this gem whenever Rodeo exposes a generally reusable ActiveAdmin/React integration need, while keeping Rodeo-specific business behavior out of the gem. Generally useful fixes discovered in ActiveAdmin or Arbre should be considered for upstream contribution.
 

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# bin/verify-release-tag
+
+source "$(dirname "$0")/_lib.sh"
+
+[[ "${GITHUB_REF_TYPE:-}" == "tag" ]] || fail "release workflow requires a tag ref"
+
+version="$(run ruby -Ilib -ractive_admin/react/version -e 'print ActiveAdmin::React::VERSION')"
+expected_tag="v${version}"
+[[ "${GITHUB_REF_NAME:-}" == "$expected_tag" ]] || fail "tag must match gem version: $expected_tag"
+[[ "$(git rev-parse HEAD)" == "$(git rev-parse origin/master)" ]] || fail "release tag must point to current origin/master"
+
+say "Verified $expected_tag at current origin/master"

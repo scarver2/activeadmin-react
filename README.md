@@ -2,7 +2,44 @@
 
 React islands for ActiveAdmin, with an Arbre-native Ruby API and optional asynchronous integrations.
 
-This repository is being bootstrapped through stacked pull requests. The project will keep ActiveAdmin Rails-first and server-rendered while providing opt-in React components for highly interactive administrative experiences.
+ActiveAdmin React keeps ActiveAdmin Rails-first and server-rendered while providing opt-in
+React components for highly interactive administrative experiences. `0.1.0.beta1` is a
+prerelease: the core direction is established, but the public contracts named in the
+[changelog](CHANGELOG.md) may still be refined before `0.1.0`.
+
+## Installation and Compatibility
+
+Add the beta to an ActiveAdmin application:
+
+```ruby
+gem "activeadmin-react", "0.1.0.beta1"
+```
+
+Then run `bundle install`. Beta1 supports Ruby 3.2–4.0, Rails 8.x, ActiveAdmin
+`4.0.0.beta22` through the next major, and React 18 or 19 supplied by the host application.
+React is not a Ruby runtime dependency and this gem is not a SPA framework.
+
+Inside an ActiveAdmin DSL block, render a safe server-first island:
+
+```ruby
+react_component(
+  "OrdersTable",
+  props: { page: 1 },
+  fallback: -> { "Orders remain available without JavaScript." },
+  class: "orders-island"
+)
+```
+
+## Asset Integration
+
+The gem ships browser-ready ES module source under `app/javascript/active_admin/react` and
+does not impose an npm package or bundler. Vite and esbuild hosts can resolve the gem root
+with `bundle show activeadmin-react` and alias `active_admin/react` to the packaged
+`app/javascript/active_admin/react/index.js`. Importmap hosts can copy that entire module
+directory into a served vendor path and pin the entrypoint; relative imports include `.js`
+extensions for native browser resolution. In every case, the host owns `react`,
+`react-dom`, and `react-dom/client` resolution. Register components before calling
+`start()`, and compile/serve the result through the host's normal asset and CSP policy.
 
 ## Integration Host
 
@@ -13,6 +50,15 @@ contribution. Run it with:
 ```sh
 bundle exec rspec spec/integration/dummy_host_spec.rb
 ```
+
+For the complete local gate, use `bin/setup` once and then `bin/test`. `bin/package` builds,
+inspects, installs, and loads the gem in an isolated gem home. `bin/release-check` adds a
+clean-worktree and unused-tag guard without publishing anything.
+
+Repository layout: Ruby APIs live under `lib/`, browser modules under `app/javascript/`,
+RBS contracts under `sig/`, the Rails integration host under `spec/dummy/`, JavaScript
+tests under `test/javascript/`, release/CI workflows under `.github/workflows/`, and
+maintainer guidance under `docs/`.
 
 ## Mount Safety
 
@@ -137,6 +183,26 @@ Use `operationAccessibility(state)` on the visible status container. It returns 
 busy `status` for active work, a polite non-busy status for successful/cancelled terminal
 work, and an assertive `alert` for failures. Keep progress text visible and associate any
 progress bar with its label; color alone must not communicate state.
+
+## Troubleshooting
+
+- Unknown component errors mean the host did not register the exact mount name before
+  `start()` ran. Registration is case-sensitive.
+- Malformed props fail before rendering. Pass only the documented JSON-compatible Ruby
+  values and keep credentials, tenant IDs, and CSRF secrets out of props.
+- Duplicate component errors include both engine owners and sources. Rename the component
+  or remove the duplicate adapter; do not silently replace registrations.
+- Repeated mounts usually mean the host called its own lifecycle code in addition to
+  `start()`. Use one owner for Turbo listeners and call `stop()` before replacing it.
+- Rejected Cable subscriptions should be debugged on the server authorization boundary.
+  Never repair them by trusting client-provided user or tenant parameters.
+
+## Project Documentation
+
+See the [documentation index](docs/README.md), [release process](docs/releasing.md),
+[release plan](RELEASES.md), and [changelog](CHANGELOG.md). ActiveAdmin React is available
+under the [MIT License](LICENSE.txt). Issues and source live in the
+[GitHub repository](https://github.com/scarver2/activeadmin-react).
 
 —
 Stan Carver II

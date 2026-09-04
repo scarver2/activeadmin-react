@@ -1,3 +1,5 @@
+# .github/workflows/ci.yml
+
 name: CI
 
 on:
@@ -9,24 +11,44 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  ruby:
+    name: Ruby ${{ matrix.ruby }}
     strategy:
       fail-fast: false
       matrix:
         ruby: ["3.2", "3.3", "3.4", "4.0"]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - run: bundle exec rake spec
       - run: bundle exec rake rubocop
-      - uses: actions/setup-node@v4
+      - if: matrix.ruby == '4.0'
+        run: bundle exec rbs validate
+
+  javascript:
+    name: JavaScript
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.20.0
           cache: npm
       - run: npm ci
       - run: npm run test:js
-      - run: gem build activeadmin-react.gemspec
+
+  package:
+    name: Package and clean install
+    needs: [ruby, javascript]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 4.0.6
+          bundler-cache: true
+      - run: bin/package

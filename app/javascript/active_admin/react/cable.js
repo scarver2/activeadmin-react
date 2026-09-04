@@ -1,6 +1,6 @@
 // app/javascript/active_admin/react/cable.js
 
-import { normalizeEvent, validateOperationEvent } from "./protocol"
+import { normalizeEvent, validateOperationEvent } from "./protocol.js"
 
 export function subscribeToOperation({
   consumer,

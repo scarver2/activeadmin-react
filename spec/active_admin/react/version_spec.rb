@@ -18,4 +18,9 @@ RSpec.describe ActiveAdmin::React::VERSION do
   it 'is accepted by the RubyGems version parser' do
     expect(Gem::Version.new(version).to_s).to eq(version)
   end
+
+  it 'identifies the first integrated beta release' do
+    expect(version).to eq('0.1.0.beta1')
+    expect(Gem::Version.new(version)).to be_prerelease
+  end
 end
