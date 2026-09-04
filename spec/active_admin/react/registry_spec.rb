@@ -71,6 +71,25 @@ RSpec.describe ActiveAdmin::React::Registry do
       expect(registered_configuration.fetch(:label)).to eq('Priority')
     end
 
+    it 'rejects cyclic supported metadata containers with a clear error' do
+      items = []
+      items << items
+
+      expect { register(:orders, items:) }.to raise_error(
+        ActiveAdmin::React::Error,
+        'metadata must not contain cyclic containers'
+      )
+    end
+
+    it 'allows shared non-cyclic metadata references' do
+      shared = ['open']
+      entry = register(:orders, primary: shared, secondary: shared)
+
+      expect(entry.metadata.fetch(:primary)).to eq(['open'])
+      expect(entry.metadata.fetch(:secondary)).to eq(['open'])
+      expect(entry.metadata.fetch(:primary)).not_to be(entry.metadata.fetch(:secondary))
+    end
+
     it 'rejects duplicate ownership with actionable diagnostics' do
       register(:orders)
 
