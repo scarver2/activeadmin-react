@@ -1,3 +1,4 @@
+# lib/active_admin/react/contributions.rb
 # frozen_string_literal: true
 
 module ActiveAdmin
@@ -10,8 +11,12 @@ module ActiveAdmin
         @registry ||= Registry.new
       end
 
-      def register(name, source:, owner:, **metadata)
-        registry.register(name, source: source, owner: owner, **metadata)
+      def register(name, **attributes)
+        registry.register(name, **attributes)
+      end
+
+      def diagnostics
+        registry.diagnostics
       end
 
       def reset!

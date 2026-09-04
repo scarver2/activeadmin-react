@@ -13,12 +13,14 @@ RSpec.describe 'ActiveAdmin React dummy host' do
   include Capybara::DSL
 
   before do
-    next if ActiveAdmin::React::Contributions.registry.to_a.any? { |entry| entry.name == 'engine-status' }
+    next if ActiveAdmin::React::Contributions.registry.registered?('engine-status')
 
     ActiveAdmin::React::Contributions.register(
       'engine-status',
+      namespace: 'dummy.inventory',
       source: 'dummy-engine',
       owner: 'activeadmin-react-dummy',
+      surfaces: %i[component panel],
       display: 'Engine contribution'
     )
   end
@@ -63,6 +65,8 @@ RSpec.describe 'ActiveAdmin React dummy host' do
 
     expect(entry.source).to eq('dummy-engine')
     expect(entry.owner).to eq('activeadmin-react-dummy')
+    expect(entry.namespace).to eq('dummy.inventory')
+    expect(entry.surfaces).to eq(%i[component panel])
     expect(entry.metadata).to eq(display: 'Engine contribution')
   end
 end

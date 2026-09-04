@@ -42,6 +42,39 @@ The registry rejects duplicate component names so engine contributions cannot si
 replace one another. Unknown components and malformed props raise without removing the
 server-rendered fallback.
 
+## Engine Contributions
+
+Engine adapters are explicit: requiring `active_admin/react` never searches engines,
+eager-loads models, or requires third-party adapter files. An engine owns a small adapter
+entry point, and the host requires and installs that adapter from an initializer:
+
+```ruby
+module CommerceEngine
+  module ActiveAdminReact
+    module_function
+
+    def install!
+      ActiveAdmin::React::Contributions.register(
+        "OrdersTable",
+        namespace: "commerce.admin",
+        owner: "CommerceEngine",
+        source: "commerce_engine/active_admin_react",
+        surfaces: %i[component page],
+        description: "Interactive order review"
+      )
+    end
+  end
+end
+```
+
+`name`, `namespace`, `owner`, and `source` are required. `surfaces` defaults to
+`[:component]` and can advertise future host placements such as panels or pages without
+coupling the core gem to an application. Component names remain globally unique because
+the browser registry is global; a conflict raises an error naming both owners, namespaces,
+and sources. Enumeration and `diagnostics` sort by namespace, component name, and owner so
+results do not depend on Rails engine load order. Hosts may call `registered?` to make a
+`to_prepare` installer idempotent and `reset!` to isolate tests.
+
 ## Asynchronous Operations
 
 Action Cable transports operation state; application jobs and services own expensive work.
