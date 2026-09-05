@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# bin/browser-test
+
+source "$(dirname "$0")/_lib.sh"
+
+say "Running Chromium against the ActiveAdmin dummy host"
+run npm run test:browser -- "$@"
