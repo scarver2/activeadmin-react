@@ -4,7 +4,14 @@
 
 All notable changes to ActiveAdmin React are recorded here. During ordinary pre-1.0 development, PATCH releases contain fixes and small compatible improvements; MINOR releases may contain new capabilities, meaningful API evolution, and documented breaking changes.
 
-## 0.1.0 — Unreleased
+## 0.1.0.alpha1 — 2026-09-05
+
+First integrated prerelease for Rodeo dogfooding. Public Ruby and JavaScript contracts
+remain unstable during the 0.x line. This alpha includes the capabilities below and
+real Chromium coverage for engine rendering, Turbo cleanup/remount, server fallbacks,
+and live Action Cable reconnect/replay. Supported runtime dependencies are Ruby >= 3.2,
+Rails >= 8.0 and < 9, and ActiveAdmin >= 4.0.0.beta22 and < 5; React 18/19 is supplied
+by the host.
 
 ### Added
 

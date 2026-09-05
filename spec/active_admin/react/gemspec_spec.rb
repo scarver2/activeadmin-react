@@ -40,11 +40,11 @@ RSpec.describe 'activeadmin-react.gemspec' do
   it 'publishes immutable release metadata' do
     expect(gemspec.metadata).to include(
       'bug_tracker_uri' => 'https://github.com/scarver2/activeadmin-react/issues',
-      'changelog_uri' => 'https://github.com/scarver2/activeadmin-react/blob/v0.1.0/CHANGELOG.md',
-      'documentation_uri' => 'https://github.com/scarver2/activeadmin-react/blob/v0.1.0/README.md',
+      'changelog_uri' => 'https://github.com/scarver2/activeadmin-react/blob/v0.1.0.alpha1/CHANGELOG.md',
+      'documentation_uri' => 'https://github.com/scarver2/activeadmin-react/blob/v0.1.0.alpha1/README.md',
       'homepage_uri' => 'https://github.com/scarver2/activeadmin-react',
       'rubygems_mfa_required' => 'true',
-      'source_code_uri' => 'https://github.com/scarver2/activeadmin-react/tree/v0.1.0'
+      'source_code_uri' => 'https://github.com/scarver2/activeadmin-react/tree/v0.1.0.alpha1'
     )
   end
 end

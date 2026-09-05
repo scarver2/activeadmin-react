@@ -11,6 +11,6 @@ RSpec.describe ActiveAdmin::React do
   end
 
   it 'exposes the current pre-1.0 version' do
-    expect(ActiveAdmin::React::VERSION).to eq('0.1.0')
+    expect(ActiveAdmin::React::VERSION).to eq('0.1.0.alpha1')
   end
 end
