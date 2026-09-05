@@ -39,7 +39,8 @@ RSpec.describe 'release workflow' do
 
   it 'provides the Bundler release task required by the publishing action' do
     root = File.expand_path('../..', __dir__)
-    ruby = 'require "rake"; Rake.application.init; Rake.application.load_rakefile; exit(Rake::Task.task_defined?(:release) ? 0 : 1)'
+    ruby = 'require "rake"; Rake.application.init; Rake.application.load_rakefile; ' \
+           'exit(Rake::Task.task_defined?(:release) ? 0 : 1)'
     _output, error, status = Open3.capture3('bundle', 'exec', 'ruby', '-e', ruby, chdir: root)
 
     expect(status).to be_success, error
