@@ -24,6 +24,12 @@ class OperationsChannel < ApplicationCable::Channel
     return reject unless operation
 
     stream_from(operation.broadcast_key)
-    transmit(operation.snapshot)
+    send_initial_snapshot
+  end
+
+  def send_initial_snapshot
+    # The live demo requests replay in connected(), avoiding a newer snapshot
+    # advancing its cursor before missed events have been delivered.
+    transmit(operation.snapshot) unless params[:resume_only]
   end
 end

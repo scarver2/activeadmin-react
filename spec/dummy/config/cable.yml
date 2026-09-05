@@ -1,4 +1,4 @@
 # spec/dummy/config/cable.yml
 
 test:
-  adapter: test
+  adapter: <%= ENV['ACTIVEADMIN_REACT_BROWSER_TEST'] == '1' ? 'async' : 'test' %>

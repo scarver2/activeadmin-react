@@ -4,6 +4,7 @@ import * as Turbo from "@hotwired/turbo"
 import React from "react"
 import { registerComponent, resolveComponent, start } from "../../../../app/javascript/active_admin/react/index.js"
 import { install } from "../../../fixtures/inventory_engine/app/javascript/inventory_engine/active_admin_react.js"
+import { DemoOperation } from "./demo_operation.js"
 
 // Test-only lifecycle counters survive Turbo visits, but not a full document reload.
 window.dummyLifecycle = { mounts: 0, unmounts: 0, cachedRoots: [] }
@@ -15,6 +16,7 @@ function OrdersTable({ page }) {
   return React.createElement("p", { "data-testid": "orders-table" }, `Orders page ${page}`)
 }
 registerComponent("OrdersTable", OrdersTable)
+registerComponent("DemoOperation", DemoOperation)
 install({ registerComponent, resolveComponent })
 Turbo.start()
 start()
