@@ -31,7 +31,7 @@ Before tagging, confirm every required GitHub Actions quality and package job is
 
 ## Publishing
 
-For an ordinary pre-1.0 release, create a tag that exactly matches the gem version with a leading `v`, such as `v0.1.0` or `v0.2.3`. When Rodeo dogfooding indicates readiness to converge on 1.0, use `v1.0.0.rc1` and increment the candidate number as needed. Do not add prerelease suffixes to `0.x` versions.
+Create a tag that exactly matches the gem version with a leading `v`: `v0.MINOR.PATCH`, or an authorized prerelease `v0.MINOR.PATCH.alphaN` or `v0.MINOR.PATCH.betaN`. The first integrated prerelease is `v0.1.0.alpha1`. When Rodeo dogfooding indicates readiness to converge on 1.0, use `v1.0.0.rcN`. All numeric components have no leading zeroes, and prerelease `N` starts at 1. Other suffixes, `0.x` release candidates, `1.0.0` alpha/beta versions, and build metadata are rejected by the guard.
 
 Push the tag only from the reviewed `master` commit. The tag-triggered `.github/workflows/release.yml` job checks out that commit and publishes through the protected `release` environment and RubyGems Trusted Publishing. Approving that environment deployment authorizes publication; local validation never does.
 

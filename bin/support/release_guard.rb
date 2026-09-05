@@ -65,7 +65,7 @@ module ActiveAdminReact
     # Rejects release attempts unless version, tag, commit, and repository state agree.
     class Guard
       NUMBER = '(?:0|[1-9]\d*)'
-      TAG_PATTERN = /\Av(?:0\.#{NUMBER}\.#{NUMBER}|1\.0\.0\.rc[1-9]\d*)\z/
+      TAG_PATTERN = /\Av(?:0\.#{NUMBER}\.#{NUMBER}(?:\.(?:alpha|beta)[1-9]\d*)?|1\.0\.0\.rc[1-9]\d*)\z/
 
       def initialize(version:, repository:, environment: ENV)
         @version = version
@@ -100,7 +100,7 @@ module ActiveAdminReact
       end
 
       def validate_tag!(tag)
-        check(TAG_PATTERN.match?(tag), 'tag must be v0.MINOR.PATCH or v1.0.0.rcN')
+        check(TAG_PATTERN.match?(tag), 'tag must be v0.MINOR.PATCH[.alphaN|.betaN] or v1.0.0.rcN (N >= 1)')
       end
 
       def verify_repository!(tag)

@@ -36,9 +36,46 @@ RSpec.describe ActiveAdminReact::ReleaseSupport::Guard do
   end
   let(:guard) { described_class.new(version: '0.1.0', repository: repository, environment: environment) }
 
+  %w[0.1.0.alpha1 0.1.0.beta1].each do |version|
+    context "with prerelease #{version}" do
+      let(:guard) { described_class.new(version: version, repository: repository, environment: environment) }
+
+      before { environment['GITHUB_REF_NAME'] = "v#{version}" }
+
+      it 'accepts matching CI and unused local tags' do
+        expect(guard.verify_ci!).to eq("v#{version}")
+        repository.tag_commit_value = nil
+        expect(guard.verify_local!).to eq("v#{version}")
+      end
+
+      it 'rejects a version mismatch' do
+        environment['GITHUB_REF_NAME'] = 'v0.1.0'
+        expect { guard.verify_ci! }.to raise_error(release_error, /match gem version/)
+      end
+
+      it 'rejects stale release commits' do
+        repository.remote_master = 'b' * 40
+        expect { guard.verify_ci! }.to raise_error(release_error, %r{current origin/master})
+      end
+
+      it 'rejects dirty sources' do
+        repository.clean = false
+        expect { guard.verify_ci! }.to raise_error(release_error, /clean working tree/)
+      end
+
+      it 'rejects reused tags' do
+        expect { guard.verify_local! }.to raise_error(release_error, /exists locally/)
+        repository.tag_commit_value = nil
+        repository.remote_tag = true
+        expect { guard.verify_local! }.to raise_error(release_error, /exists on origin/)
+      end
+    end
+  end
+
   describe 'tag policy' do
     it 'accepts ordinary pre-1.0 and future 1.0 release-candidate tags' do
-      %w[v0.0.0 v0.1.0 v0.12.34 v1.0.0.rc1 v1.0.0.rc10].each do |tag|
+      tags = %w[v0.0.0 v0.1.0 v0.12.34 v0.1.0.alpha1 v0.1.0.alpha12 v0.1.0.beta1 v0.2.3.beta4 v1.0.0.rc1 v1.0.0.rc10]
+      tags.each do |tag|
         expect(described_class::TAG_PATTERN).to match(tag)
       end
     end
@@ -50,8 +87,19 @@ RSpec.describe ActiveAdminReact::ReleaseSupport::Guard do
         V0.1.0
         v0.01.0
         v0.1
-        v0.1.0.alpha1
-        v0.1.0.beta1
+        v0.1.0.alpha0
+        v0.1.0.alpha01
+        v0.1.0.beta0
+        v0.1.0.beta01
+        v0.1.0.alpha
+        v0.1.0.beta-1
+        v0.1.0.preview1
+        v0.1.0.alpha1.extra
+        v0.1.0.alpha1+build.1
+        v0.01.0.alpha1
+        v0.1.00.beta1
+        v1.0.0.alpha1
+        v1.0.0.beta1
         v0.1.0+build.1
         v0.1.0.rc1
         v1.0.0
@@ -90,7 +138,7 @@ RSpec.describe ActiveAdminReact::ReleaseSupport::Guard do
     end
 
     it 'rejects a malformed tag' do
-      environment['GITHUB_REF_NAME'] = 'v0.1.0.beta1'
+      environment['GITHUB_REF_NAME'] = 'v0.1.0.beta01'
 
       expect { guard.verify_ci! }.to raise_error(release_error, /v0\.MINOR\.PATCH/)
     end
@@ -128,7 +176,7 @@ RSpec.describe ActiveAdminReact::ReleaseSupport::Guard do
     end
 
     it 'rejects a version outside the release allowlist' do
-      invalid = described_class.new(version: '0.1.0.beta1', repository: repository)
+      invalid = described_class.new(version: '0.1.0.beta01', repository: repository)
 
       expect { invalid.verify_local! }.to raise_error(release_error, /v0\.MINOR\.PATCH/)
     end

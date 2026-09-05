@@ -8,8 +8,9 @@ maturity determine when a release is ready.
 
 ## Pre-1.0 versions
 
-Development uses ordinary `0.MINOR.PATCH` versions without prerelease suffixes. The first
-integrated release is `0.1.0`.
+Development uses ordinary `0.MINOR.PATCH` versions, with explicit `0.MINOR.PATCH.alphaN`
+and `0.MINOR.PATCH.betaN` prereleases when authorized. The first integrated prerelease
+is `0.1.0.alpha1`. Prerelease numbers start at 1 and have no leading zeroes.
 
 - Increment PATCH for fixes and small backward-compatible improvements.
 - Increment MINOR for new capabilities, meaningful API evolution, and documented breaking
@@ -36,7 +37,8 @@ public APIs.
 1. Merge the entire reviewed stack into `master`.
 2. Ensure CI is green at the exact release commit.
 3. Update `ActiveAdmin::React::VERSION` and release notes.
-4. Tag that exact commit with the matching `vX.Y.Z` or `v1.0.0.rcN` tag.
+4. Tag that exact commit with the matching `v0.MINOR.PATCH`, optional `.alphaN` or
+   `.betaN` suffix, or future `v1.0.0.rcN` tag. Numeric components have no leading zeroes.
 5. Let GitHub Actions publish through RubyGems Trusted Publishing and the `release`
    environment.
 6. Verify the gem is installable and its provenance is visible on RubyGems.org.
