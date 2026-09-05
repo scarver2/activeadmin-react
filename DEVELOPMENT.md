@@ -32,7 +32,7 @@ Added engine-owned component contribution contracts so feature engines can expos
 
 ### ActiveAdmin 4 dummy integration host
 
-Added a clean Rails/ActiveAdmin 4 host used to prove installability, multiple islands, server fallbacks, navigation remounts, and engine contribution behavior without Rodeo-specific dependencies.
+Added a Rails/ActiveAdmin 4 host with request-level coverage for multiple-island markup, server fallbacks, consistent markup across navigation requests, and contribution registry metadata without Rodeo-specific dependencies. These tests do not execute React in a browser or load an independent fixture engine. Real-browser lifecycle proof is tracked in [#41](https://github.com/scarver2/activeadmin-react/issues/41), live Action Cable proof in [#42](https://github.com/scarver2/activeadmin-react/issues/42), and fixture-engine integration in [#43](https://github.com/scarver2/activeadmin-react/issues/43).
 
 ### Mount safety and props hardening
 
