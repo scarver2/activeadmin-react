@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'rake'
 
 # A workflow is executable configuration rather than a Ruby class.
 # rubocop:disable-next RSpec/DescribeClass
@@ -34,5 +35,16 @@ RSpec.describe 'release workflow' do
 
     expect(action_references).not_to be_empty
     expect(action_references).to all(match(/\A[0-9a-f]{40}\z/))
+  end
+
+  it 'provides the Bundler release task required by the publishing action' do
+    rakefile = File.expand_path('../../Rakefile', __dir__)
+    original_application = Rake.application
+    Rake.application = Rake::Application.new
+    load rakefile
+
+    expect(Rake::Task.task_defined?(:release)).to be(true)
+  ensure
+    Rake.application = original_application
   end
 end
