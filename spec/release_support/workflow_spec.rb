@@ -10,8 +10,8 @@ RSpec.describe 'release workflow' do
   subject(:workflow) { File.read(File.expand_path('../../.github/workflows/release.yml', __dir__)) }
 
   it 'runs only for the allowed release tag families' do
-    expect(workflow).to include('- "v0.*.*"', '- "v1.0.0.rc*"')
-    expect(workflow).not_to include('pull_request:', 'workflow_dispatch:')
+    expect(workflow).to include('- "v0.*.*"', '- "v0.*.*.alpha*"', '- "v0.*.*.beta*"', '- "v1.0.0.rc*"')
+    expect(workflow).not_to include('pull_request:', 'workflow_dispatch:', 'branches:', '- "v*"')
   end
 
   it 'requires validation before the protected publish job' do

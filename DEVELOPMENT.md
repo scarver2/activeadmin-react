@@ -60,7 +60,7 @@ Recursively copied and froze supported metadata containers, preserved caller-own
 
 Replaced alpha/beta milestone naming with ordinary `0.MINOR.PATCH` development releases. PATCH versions carry fixes and small compatible improvements; MINOR versions may carry capabilities, meaningful API evolution, and documented breaking changes while the public API remains unstable under SemVer `0.y.z` rules.
 
-The project will move to `1.0.0.rc1` only when Rodeo dogfooding indicates that the public contracts are ready to stabilize.
+Issue #49 subsequently authorized explicit `0.MINOR.PATCH.alphaN` and `.betaN` prereleases, starting with `0.1.0.alpha1`; the current policy lives in `RELEASES.md`. The project will move to `1.0.0.rc1` only when Rodeo dogfooding indicates that the public contracts are ready to stabilize.
 
 ### Focused local validation
 

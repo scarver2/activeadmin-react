@@ -6,6 +6,8 @@ on:
   push:
     tags:
       - "v0.*.*"
+      - "v0.*.*.alpha*"
+      - "v0.*.*.beta*"
       - "v1.0.0.rc*"
 
 permissions:
