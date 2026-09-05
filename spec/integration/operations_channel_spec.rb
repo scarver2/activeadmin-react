@@ -66,6 +66,17 @@ RSpec.describe OperationsChannel do
     expect(connection.transmissions).to be_empty
   end
 
+  it 'lets live clients request ordered replay without a snapshot advancing their cursor' do
+    allow(repository).to receive(:find_authorized).and_return(operation)
+    replay_channel = TestOperationsChannel.new(connection, 'operations', operation_id: 'op-1', resume_only: true)
+
+    replay_channel.send(:subscribed)
+    expect(connection.transmissions).to be_empty
+    replay_channel.resume('after_sequence' => 0)
+
+    expect(connection.transmissions.map { |item| item[:message] }).to eq(events.map(&:stringify_keys))
+  end
+
   it 'replays only events after the client resume cursor' do
     allow(repository).to receive(:find_authorized).and_return(operation)
     channel.send(:subscribed)
