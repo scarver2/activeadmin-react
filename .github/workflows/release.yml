@@ -1,23 +1,56 @@
+# .github/workflows/release.yml
+
 name: Release gem
 
 on:
   push:
     tags:
-      - "v*"
+      - "v0.*.*"
+      - "v1.0.0.rc*"
+
+permissions:
+  contents: read
 
 jobs:
-  release:
+  verify:
+    name: Verify release source and package
+    if: github.repository == 'scarver2/activeadmin-react'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
+        with:
+          ruby-version: 4.0.6
+          bundler-cache: true
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24.20.0
+          cache: npm
+      - run: npm ci
+      - run: bin/verify-release-tag
+      - run: bin/test
+      - run: bin/package
+
+  publish:
+    name: Publish gem
+    if: github.repository == 'scarver2/activeadmin-react'
+    needs: verify
     runs-on: ubuntu-latest
     environment: release
     permissions:
       contents: write
       id-token: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
+          fetch-depth: 0
           persist-credentials: false
-      - uses: ruby/setup-ruby@v1
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1
         with:
-          ruby-version: ruby
+          ruby-version: 4.0.6
           bundler-cache: true
-      - uses: rubygems/release-gem@v1
+      - run: bin/verify-release-tag
+      - uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1

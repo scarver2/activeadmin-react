@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+# bin/release-check
+# frozen_string_literal: true
+
+require_relative '../lib/active_admin/react/version'
+require_relative 'support/release_guard'
+
+begin
+  root = File.expand_path('..', __dir__)
+  repository = ActiveAdminReact::ReleaseSupport::Repository.new(root)
+  guard = ActiveAdminReact::ReleaseSupport::Guard.new(
+    version: ActiveAdmin::React::VERSION,
+    repository: repository
+  )
+  check = ActiveAdminReact::ReleaseSupport::LocalCheck.new(
+    guard: guard,
+    commands: [File.join(root, 'bin/test'), File.join(root, 'bin/package')]
+  )
+  check.run!
+rescue ActiveAdminReact::ReleaseSupport::Error => e
+  warn "ERROR: #{e.message}"
+  exit 1
+end

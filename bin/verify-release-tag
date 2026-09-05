@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+# bin/verify-release-tag
+# frozen_string_literal: true
+
+require_relative '../lib/active_admin/react/version'
+require_relative 'support/release_guard'
+
+begin
+  repository = ActiveAdminReact::ReleaseSupport::Repository.new(File.expand_path('..', __dir__))
+  guard = ActiveAdminReact::ReleaseSupport::Guard.new(
+    version: ActiveAdmin::React::VERSION,
+    repository: repository
+  )
+
+  tag = guard.verify_ci!
+  puts "Verified #{tag} at current origin/master"
+rescue ActiveAdminReact::ReleaseSupport::Error => e
+  warn "ERROR: #{e.message}"
+  exit 1
+end
