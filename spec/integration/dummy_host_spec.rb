@@ -27,13 +27,13 @@ RSpec.describe 'ActiveAdmin React dummy host' do
   end
 
   it 'keeps server fallback markup for an unknown component' do
-    visit '/admin/integration_demo'
+    visit '/admin/integration_demo?failure=unknown'
 
     expect(page).to have_css('[data-react-component="UnregisteredComponent"]')
     expect(page).to have_text('This unregistered island uses server fallback.')
   end
 
-  it 'remounts deterministically after navigating away and back' do
+  it 'renders consistent server markup after navigating away and back' do
     visit '/admin/integration_demo'
     first_islands = all('[data-react-component]').map do |island|
       [island['data-react-component'], island['data-react-props'], island.text]

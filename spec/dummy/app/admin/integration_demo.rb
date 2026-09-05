@@ -20,12 +20,18 @@ ActiveAdmin.register_page 'Integration Demo' do
         fallback: -> { 'Engine status is available without JavaScript.' },
         class: 'engine-island'
       )
-      react_component(
-        'UnregisteredComponent',
-        props: { safe: true },
-        fallback: -> { 'This unregistered island uses server fallback.' },
-        class: 'fallback-island'
-      )
+      if params[:failure] == 'unknown'
+        react_component(
+          'UnregisteredComponent',
+          props: { safe: true },
+          fallback: -> { 'This unregistered island uses server fallback.' },
+          class: 'fallback-island'
+        )
+      end
+
+      if params[:failure] == 'malformed'
+        div 'Malformed props fallback.', 'data-react-component': 'OrdersTable', 'data-react-props': '{broken'
+      end
     end
   end
 end
