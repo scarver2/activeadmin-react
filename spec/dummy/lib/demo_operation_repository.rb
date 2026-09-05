@@ -34,6 +34,7 @@ class DemoOperationRepository
         sequence = @events.length + 1
         event = { operation_id: id, idempotency_key: "#{id}:#{sequence}", sequence: sequence,
                   state: state, progress: progress, message: "Demo #{state}" }
+        event[:error] = 'Demonstration failure' if state == 'failed'
         @events << event.freeze
         event.dup
       end

@@ -3,7 +3,7 @@
 
 class DemoOperationsController < ApplicationController
   rescue_from ActionController::RoutingError do
-    head :not_found
+    render json: { error: 'not_found' }, status: :not_found
   end
 
   def create
@@ -25,11 +25,35 @@ class DemoOperationsController < ApplicationController
   end
 
   def rebroadcast
-    ActionCable.server.broadcast(operation.broadcast_key, operation.snapshot)
+    event = selected_event
+    return head :unprocessable_entity unless event
+
+    event[:idempotency_key] = "#{event[:idempotency_key]}:stale-fault" if params[:unique_key]
+    ActionCable.server.broadcast(operation.broadcast_key, event)
     head :accepted
   end
 
+  def cancel
+    return head :unprocessable_entity unless params[:operation_id] == params[:id]
+
+    current = operation
+    DemoOperationJob.perform_later(current.id, *identity.values, 'cancelled', current.snapshot[:progress])
+    render json: current.snapshot, status: :accepted
+  end
+
+  # Reveals only a deliberately seeded fixture ID so clients can test denial.
+  def foreign
+    render json: { operation_id: Rails.application.config.demo_foreign_operation.id }
+  end
+
   private
+
+  def selected_event
+    return operation.snapshot unless params[:sequence]
+
+    sequence = Integer(params[:sequence], exception: false)
+    operation.events_after(0).find { |candidate| candidate[:sequence] == sequence }
+  end
 
   def valid_event?(state, progress)
     %w[queued running retrying completed failed cancelled].include?(state) && progress&.between?(0, 100)

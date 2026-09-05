@@ -6,6 +6,8 @@ ActiveAdmin.register_page 'Integration Demo' do
 
   content do
     h1 'React integration demo'
+    react_component('DemoOperation', fallback: -> { 'Operation demo requires JavaScript.' }) if
+      ENV['ACTIVEADMIN_REACT_BROWSER_TEST'] == '1'
 
     div id: 'island-region' do
       react_component(

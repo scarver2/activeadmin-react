@@ -17,8 +17,11 @@ module ActiveAdminReactDummy
     config.active_support.deprecation = :silence
     config.action_dispatch.show_exceptions = :none
     config.autoload_paths << root.join('lib')
-    if ENV['ACTIVEADMIN_REACT_BROWSER_TEST'] == '1'
+    if Rails.env.test? && ENV['ACTIVEADMIN_REACT_BROWSER_TEST'] == '1'
       config.demo_operations = DemoOperationRepository.new
+      config.demo_foreign_operation = config.demo_operations.create(
+        tenant_id: 'foreign-tenant', user_id: 'foreign-user'
+      )
       config.middleware.use DemoIdentity, config.demo_operations
     end
   end
