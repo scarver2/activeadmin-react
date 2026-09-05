@@ -4,6 +4,7 @@
 require_relative 'boot'
 require 'rails/all'
 require 'active_admin/react'
+require_relative '../../fixtures/inventory_engine/lib/inventory_engine'
 
 module ActiveAdminReactDummy
   class Application < Rails::Application

@@ -2,6 +2,21 @@
 
 # Dummy Host
 
+The fixture in `spec/fixtures/inventory_engine` is a real Rails Engine with public
+Ruby and JavaScript adapter entrypoints. The host explicitly installs those adapters.
+Run its real Chromium component proof from the repository root:
+
+```sh
+bin/setup
+mise exec -- npx playwright install chromium
+bin/browser-test
+```
+
+This builds the dummy assets with Vite and starts Puma on loopback through Playwright.
+The dummy head intentionally loads only the test bundle; it does not validate AA4's
+own styles or menu JavaScript. The browser job runs independently in CI. Lifecycle
+and live transport coverage are tracked separately in #41 and #42.
+
 The Rails application in this directory exercises `activeadmin-react` as an installed
 path gem. Run its deterministic integration suite with:
 

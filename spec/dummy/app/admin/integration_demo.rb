@@ -16,7 +16,7 @@ ActiveAdmin.register_page 'Integration Demo' do
       )
       react_component(
         'EngineStatus',
-        props: ActiveAdmin::React::Contributions.registry.fetch('engine-status').metadata,
+        props: ActiveAdmin::React::Contributions.registry.fetch('EngineStatus').metadata,
         fallback: -> { 'Engine status is available without JavaScript.' },
         class: 'engine-island'
       )

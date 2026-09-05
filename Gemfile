@@ -17,6 +17,7 @@ end
 group :test do
   gem 'capybara', '~> 3.40', require: false
   gem 'fakefs', '~> 3.0', require: false
+  gem 'puma', '~> 6.0', require: false
   gem 'rspec', '~> 3.13', require: false
   gem 'simplecov', '~> 0.22', require: false
   gem 'sqlite3', '~> 2.9', require: false
