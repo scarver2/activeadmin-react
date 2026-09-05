@@ -1,76 +1,83 @@
+<!-- README.md -->
+
 # ActiveAdmin React
 
 React islands for ActiveAdmin, with an Arbre-native Ruby API and optional asynchronous integrations.
 
-This repository is being bootstrapped through stacked pull requests. The project will keep ActiveAdmin Rails-first and server-rendered while providing opt-in React components for highly interactive administrative experiences.
+ActiveAdmin React keeps administrative pages Rails-first and server-rendered while making React available for interactions that benefit from a client-side component. The project is on the ordinary pre-1.0 `0.x` line, so documented breaking changes may ship in a MINOR release while Rodeo dogfooding helps stabilize the public contracts.
 
-## Development
+## Installation and compatibility
 
-Install the pinned Ruby and Node runtimes and their dependencies, then run the complete
-local quality gate:
+Add the gem to a Rails application that uses ActiveAdmin:
 
-```sh
-bin/setup
-bin/test
+```ruby
+gem "activeadmin-react", "~> 0.1.0", require: "active_admin/react"
 ```
 
-The commands remain composable for focused development:
+Then run `bundle install`. The gem requires Ruby 3.2 or newer, Rails 8.x, and ActiveAdmin `4.0.0.beta22` or newer within the 4.x line. The JavaScript runtime uses the React 18/19 `createRoot` API; the host supplies `react` and `react-dom` and remains responsible for compiling and serving browser assets.
 
-```sh
-mise exec -- bundle exec rake spec
-mise exec -- bundle exec rake rubocop
-mise exec -- bundle exec rake rbs
-mise exec -- npm run test:js
-mise exec -- bundle exec rspec spec/integration
+## Render an island from Arbre
+
+The `react_component` helper is available inside ActiveAdmin's Arbre DSL:
+
+```ruby
+ActiveAdmin.register Order do
+  show do
+    panel "Order activity" do
+      react_component(
+        "OrdersTable",
+        props: { order_id: resource.id },
+        fallback: -> { "Order activity is available without JavaScript." },
+        class: "orders-table"
+      )
+    end
+  end
+end
 ```
 
-`bin/test` includes the dummy ActiveAdmin 4 integration specs through the full RSpec suite.
-`bin/package` builds the gem, verifies its exact contents, installs it with dependencies in
-an isolated gem home, and proves Rails loads the installed copy. It never publishes.
+Props may contain `nil`, booleans, strings, integers, finite floats, symbols, dates, times, arrays, and hashes with string or symbol keys. Symbols become strings and date/time values become ISO 8601 strings. Unsupported values, non-finite floats, invalid component names, and malformed `data` attributes raise `ArgumentError` before markup is rendered.
 
-## Integration Host
+The mount owns the `data-react-component` and `data-react-props` attributes. Other HTML and data attributes remain caller-owned. A callable fallback receives polite `status` semantics by default and stays in the page until React mounts successfully.
 
-The Rails/ActiveAdmin 4 dummy host proves the gem installation and pre-1.0 integration path,
-including multiple islands, server fallback, navigation remounts, and a public engine
-contribution. Run it with:
+## Register and start components
 
-```sh
-bundle exec rspec spec/integration/dummy_host_spec.rb
+The packaged JavaScript entrypoint is `app/javascript/active_admin/react/index.js`. Configure the host's Vite, esbuild, or equivalent resolver so `active_admin/react` points to that file inside the installed gem. For example, Vite can derive the gem root with `bundle show activeadmin-react`:
+
+```js
+import { execFileSync } from "node:child_process"
+import { resolve } from "node:path"
+import { defineConfig } from "vite"
+
+const gemRoot = execFileSync("bundle", ["show", "activeadmin-react"], {
+  encoding: "utf8"
+}).trim()
+
+export default defineConfig({
+  resolve: {
+    alias: {
+      "active_admin/react": resolve(gemRoot, "app/javascript/active_admin/react/index.js")
+    }
+  }
+})
 ```
 
-## Mount Safety
+Register every component before starting the runtime:
 
-The react_component helper accepts JSON-compatible props plus Date, DateTime, and Time
-values. Symbols become strings, nested arrays and hashes are normalized recursively,
-and unsupported prop objects, non-finite floats, invalid component names, or malformed
-data attributes raise ArgumentError. Strings are serialized as data, never executable
-JavaScript. Caller data attributes are preserved except for the reserved
-react-component and react-props keys, which the mount owns.
+```js
+import { registerComponent, start } from "active_admin/react"
+import OrdersTable from "./components/OrdersTable"
 
-A callable fallback is rendered on the server with a polite live-region status
-affordance, so the page remains useful without JavaScript. The gem emits no inline
-scripts and does not create CSP nonces. Hosts should serve compiled React assets through
-their normal CSP-aware asset pipeline and keep CSRF tokens in Rails-managed forms or
-meta tags rather than passing them as component props.
+registerComponent("OrdersTable", OrdersTable)
+start()
+```
 
-## JavaScript Runtime
+`start()` mounts every `[data-react-component]` island, mounts newly rendered pages after `turbo:load`, and unmounts roots before Turbo caches the page. Repeated calls are safe. `stop()` removes the Turbo listeners and unmounts tracked roots. Duplicate component names, unknown components, and malformed JSON props fail loudly.
 
-The JavaScript entrypoint is intentionally bundler-neutral. Import the public API from
-`active_admin/react` through the host's normal importmap, esbuild, Vite, or other asset
-entrypoint, register components explicitly, and call `start()` once after the host's
-JavaScript has loaded. The runtime mounts each `[data-react-component]` island, remounts
-after `turbo:load`, and unmounts before Turbo caches a page. `stop()` removes those
-listeners and any tracked roots for hosts that manage their own lifecycle.
+The shipped modules use package-style relative imports intended for a JavaScript build tool. Copying the directory directly into an importmap or serving it to browsers without a resolver is not currently a supported integration path.
 
-The registry rejects duplicate component names so engine contributions cannot silently
-replace one another. Unknown components and malformed props raise without removing the
-server-rendered fallback.
+## Engine contributions
 
-## Engine Contributions
-
-Engine adapters are explicit: requiring `active_admin/react` never searches engines,
-eager-loads models, or requires third-party adapter files. An engine owns a small adapter
-entry point, and the host requires and installs that adapter from an initializer:
+Requiring `active_admin/react` does not scan Rails engines, eager-load models, or require third-party adapters. An engine exposes a small adapter and the host installs it explicitly:
 
 ```ruby
 module CommerceEngine
@@ -91,21 +98,13 @@ module CommerceEngine
 end
 ```
 
-`name`, `namespace`, `owner`, and `source` are required. `surfaces` defaults to
-`[:component]` and can advertise future host placements such as panels or pages without
-coupling the core gem to an application. Component names remain globally unique because
-the browser registry is global; a conflict raises an error naming both owners, namespaces,
-and sources. Enumeration and `diagnostics` sort by namespace, component name, and owner so
-results do not depend on Rails engine load order. Hosts may call `registered?` to make a
-`to_prepare` installer idempotent and `reset!` to isolate tests. Metadata hashes, arrays,
-sets, and strings are recursively copied and frozen during registration, so later changes
-to caller-owned values cannot alter registered state and diagnostics cannot mutate it.
-Other metadata values must be immutable objects supplied by the contributor.
+`name`, `namespace`, `owner`, and `source` are required. `surfaces` defaults to `[:component]`; additional keywords become diagnostic metadata. Component names are globally unique. Conflicts identify both owners, namespaces, and sources.
 
-## Asynchronous Operations
+`ActiveAdmin::React::Contributions.diagnostics` returns entries sorted by namespace, component name, and owner. An installer can query `ActiveAdmin::React::Contributions.registry.registered?("OrdersTable")` before registering inside a reload hook. `ActiveAdmin::React::Contributions.reset!` creates a fresh registry for test isolation. Metadata hashes, arrays, sets, and strings are recursively copied and frozen during registration, so later changes to caller-owned values cannot alter registered state and diagnostics cannot mutate it. Other metadata values must be immutable objects supplied by the contributor.
 
-Action Cable transports operation state; application jobs and services own expensive work.
-Each broadcast uses a monotonic sequence and idempotency key:
+## Asynchronous Action Cable operations
+
+Action Cable transports operation state; application jobs and services own the expensive work. Each event uses a server-owned operation identifier, idempotency key, and monotonic sequence:
 
 ```json
 {
@@ -122,48 +121,81 @@ Each broadcast uses a monotonic sequence and idempotency key:
 }
 ```
 
-States are `pending`, `queued`, `running`, `retrying`, `completed`, `failed`, and
-`cancelled`; the last three are terminal. `OperationState` ignores duplicate or
-out-of-order events, events for another operation, and all updates after a terminal event.
-Pass it to `subscribeToOperation` so reconnects call the channel's `resume` action with
-the last applied sequence. Strict envelope validation is enabled by default; set
-`strict: false` only while migrating legacy event producers.
+States are `pending`, `queued`, `running`, `retrying`, `completed`, `failed`, and `cancelled`; the last three are terminal. `OperationState` ignores duplicates, out-of-order events, events for another operation, and updates after a terminal event. `subscribeToOperation` validates envelopes and resumes after the last applied sequence:
 
 ```js
 import { OperationState, subscribeToOperation } from "active_admin/react"
 
-const state = new OperationState({ operationId: operationId })
+const operationState = new OperationState({ operationId })
 const subscription = subscribeToOperation({
   consumer,
   channel: "OperationsChannel",
   params: { operation_id: operationId },
-  operationState: state,
+  operationState,
   onEvent: (_event, current) => setOperation(current),
   onProtocolError: (error) => reportProtocolError(error)
 })
 
-// Return this from a React effect so navigation/unmount removes the subscription.
 return () => subscription.unsubscribe()
 ```
 
-On the server, resolve the operation from the authenticated connection and current tenant;
-never trust user or tenant identifiers from subscription parameters. A channel's
-`subscribed` and `resume` actions should authorize the operation, stream its server-owned
-identifier, and transmit the latest snapshot or events after `after_sequence`. Channel
-callbacks must not run the operation itself. The dummy host shows one secure boundary:
-authenticated middleware places server-owned identity and an operation repository in the
-Rack environment, the connection exposes those identifiers, and the channel asks the
-repository for an operation authorized to that user and tenant.
+Use `operationAccessibility(operationState)` on the visible status container. Active work returns a polite, busy `status`; successful and cancelled work returns a polite, non-busy status; failures return an assertive `alert`.
 
-Cancellation is an authenticated application command, not a Cable message.
-`requestOperationCancellation` posts only `operation_id` with same-origin credentials and
-an optional Rails CSRF token. The endpoint must authorize the server-loaded operation,
-request cancellation from the owning job/service, and respond with the updated state.
+Cancellation is an authenticated application command rather than a Cable event:
 
-Use `operationAccessibility(state)` on the visible status container. It returns a polite,
-busy `status` for active work, a polite non-busy status for successful/cancelled terminal
-work, and an assertive `alert` for failures. Keep progress text visible and associate any
-progress bar with its label; color alone must not communicate state.
+```js
+import { requestOperationCancellation } from "active_admin/react"
+
+await requestOperationCancellation({
+  url: `/admin/operations/${operationId}/cancel`,
+  operationId,
+  csrfToken: document.querySelector('meta[name="csrf-token"]')?.content
+})
+```
+
+The helper sends only `operation_id` with same-origin credentials. The endpoint must load and authorize the operation in the current user and tenant context before asking the owning job or service to cancel it. Channels must apply the same server-side authorization before streaming or replaying events.
+
+## CSP, CSRF, and fallbacks
+
+The gem emits no inline scripts and does not create CSP nonces. Compile and serve React assets through the host's normal CSP-aware pipeline. Keep CSRF tokens in Rails-managed forms or meta tags rather than component props. Avoid placing credentials or sensitive tenant context in props because mount data is visible in HTML.
+
+Meaningful fallback content keeps the page usable when JavaScript is disabled or an asset fails. Keep progress text visible, associate progress bars with their labels, and never communicate state through color alone.
+
+## Development and testing
+
+Install pinned runtimes and dependencies, then run the complete local quality gate:
+
+```sh
+bin/setup
+bin/test
+```
+
+Focused checks remain directly runnable:
+
+```sh
+mise exec -- bundle exec rake spec
+mise exec -- bundle exec rake rubocop
+mise exec -- bundle exec rake rbs
+mise exec -- npm run test:js
+mise exec -- bundle exec rspec spec/integration
+```
+
+`bin/test` includes the dummy ActiveAdmin 4 integration host through the full RSpec suite. `bin/package` builds the gem, verifies its contents, installs it and its dependencies into an isolated gem home, and proves Rails loads the installed copy. These validation commands never publish.
+
+Ruby APIs live under `lib/`, browser modules under `app/javascript/`, RBS signatures under `sig/`, the dummy host under `spec/dummy/`, JavaScript tests under `test/javascript/`, and maintainer documentation under `docs/`.
+
+## Troubleshooting
+
+- `Unknown React component` means the exact, case-sensitive mount name was not registered before `start()` ran.
+- Prop errors mean the Arbre call received a value outside the documented grammar. Keep credentials, tenant identifiers, and CSRF tokens out of props.
+- Duplicate registration errors identify competing engine owners and sources. Rename the component or remove the duplicate adapter.
+- Repeated mounts usually mean both the host and `start()` own Turbo lifecycle listeners. Keep one lifecycle owner and call `stop()` before replacing it.
+- Rejected Cable subscriptions belong at the server authorization boundary. Never trust client-provided user or tenant parameters.
+- Browser resolution errors usually mean the host alias does not point to the packaged `app/javascript/active_admin/react/index.js` or the build tool is not resolving relative imports.
+
+## Documentation and license
+
+See the [documentation index](docs/README.md), [release process](docs/releasing.md), [release policy](RELEASES.md), and [changelog](CHANGELOG.md). ActiveAdmin React is available under the [MIT License](LICENSE.txt). Source, issues, and pull requests live in the [GitHub repository](https://github.com/scarver2/activeadmin-react).
 
 —
 Stan Carver II
