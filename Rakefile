@@ -11,4 +11,9 @@ task :js do
   sh 'npm run test:js'
 end
 
-task default: %i[spec rubocop js]
+desc 'Validate public RBS signatures'
+task :rbs do
+  sh 'bundle exec rbs validate'
+end
+
+task default: %i[spec rubocop rbs js]

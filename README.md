@@ -4,6 +4,28 @@ React islands for ActiveAdmin, with an Arbre-native Ruby API and optional asynch
 
 This repository is being bootstrapped through stacked pull requests. The project will keep ActiveAdmin Rails-first and server-rendered while providing opt-in React components for highly interactive administrative experiences.
 
+## Development
+
+Install the pinned Ruby and Node runtimes and their dependencies, then run the complete
+local quality gate:
+
+```sh
+bin/setup
+bin/test
+```
+
+The commands remain composable for focused development:
+
+```sh
+mise exec -- bundle exec rake spec
+mise exec -- bundle exec rake rubocop
+mise exec -- bundle exec rake rbs
+mise exec -- npm run test:js
+mise exec -- bundle exec rspec spec/integration
+```
+
+`bin/test` includes the dummy ActiveAdmin 4 integration specs through the full RSpec suite.
+
 ## Integration Host
 
 The Rails/ActiveAdmin 4 dummy host proves the gem installation and pre-1.0 integration path,

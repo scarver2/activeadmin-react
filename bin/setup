@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# bin/setup
+
+source "$(dirname "$0")/_lib.sh"
+
+if [[ -n "$MISE_BIN" ]]; then
+  say "Installing pinned runtimes"
+  "$MISE_BIN" install
+fi
+
+say "Installing Ruby dependencies"
+run bundle install
+
+say "Installing JavaScript dependencies"
+run npm ci
+
+say "Setup complete"
