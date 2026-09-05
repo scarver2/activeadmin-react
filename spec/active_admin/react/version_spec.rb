@@ -19,10 +19,10 @@ RSpec.describe ActiveAdmin::React::VERSION do
     expect(Gem::Version.new(version).to_s).to eq(version)
   end
 
-  it 'uses the ordinary initial 0.x release version' do
+  it 'uses the authorized initial alpha release version' do
     parsed_version = Gem::Version.new(version)
 
-    expect(version).to eq('0.1.0')
-    expect(parsed_version).not_to be_prerelease
+    expect(version).to eq('0.1.0.alpha1')
+    expect(parsed_version).to be_prerelease
   end
 end

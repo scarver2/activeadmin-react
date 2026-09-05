@@ -11,7 +11,7 @@ ActiveAdmin React keeps administrative pages Rails-first and server-rendered whi
 Add the gem to a Rails application that uses ActiveAdmin:
 
 ```ruby
-gem "activeadmin-react", "~> 0.1.0", require: "active_admin/react"
+gem "activeadmin-react", "0.1.0.alpha1", require: "active_admin/react"
 ```
 
 Then run `bundle install`. The gem requires Ruby 3.2 or newer, Rails 8.x, and ActiveAdmin `4.0.0.beta22` or newer within the 4.x line. The JavaScript runtime uses the React 18/19 `createRoot` API; the host supplies `react` and `react-dom` and remains responsible for compiling and serving browser assets.
