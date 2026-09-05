@@ -12,18 +12,7 @@ Capybara.app = ActiveAdminReactDummy::Application
 RSpec.describe 'ActiveAdmin React dummy host' do
   include Capybara::DSL
 
-  before do
-    next if ActiveAdmin::React::Contributions.registry.registered?('engine-status')
-
-    ActiveAdmin::React::Contributions.register(
-      'engine-status',
-      namespace: 'dummy.inventory',
-      source: 'dummy-engine',
-      owner: 'activeadmin-react-dummy',
-      surfaces: %i[component panel],
-      display: 'Engine contribution'
-    )
-  end
+  before { InventoryEngine::ActiveAdminReact.install! }
 
   it 'boots ActiveAdmin and renders two islands from the installable gem' do
     visit '/admin/integration_demo'
@@ -61,10 +50,10 @@ RSpec.describe 'ActiveAdmin React dummy host' do
   end
 
   it 'exposes the engine contribution through the public registry' do
-    entry = ActiveAdmin::React::Contributions.registry.fetch('engine-status')
+    entry = ActiveAdmin::React::Contributions.registry.fetch('EngineStatus')
 
-    expect(entry.source).to eq('dummy-engine')
-    expect(entry.owner).to eq('activeadmin-react-dummy')
+    expect(entry.source).to eq('inventory_engine/active_admin_react')
+    expect(entry.owner).to eq('InventoryEngine::Engine')
     expect(entry.namespace).to eq('dummy.inventory')
     expect(entry.surfaces).to eq(%i[component panel])
     expect(entry.metadata).to eq(display: 'Engine contribution')
