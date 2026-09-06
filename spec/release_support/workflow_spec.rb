@@ -9,9 +9,13 @@ require 'open3'
 RSpec.describe 'release workflow' do
   subject(:workflow) { File.read(File.expand_path('../../.github/workflows/release.yml', __dir__)) }
 
+  let(:disallowed_triggers) do
+    ['pull_request:', 'workflow_dispatch:', 'branches:', '- "v*"', '- "v0.*.*.alpha*"', '- "v0.*.*.beta*"']
+  end
+
   it 'runs only for the allowed release tag families' do
-    expect(workflow).to include('- "v0.*.*"', '- "v0.*.*.alpha*"', '- "v0.*.*.beta*"', '- "v1.0.0.rc*"')
-    expect(workflow).not_to include('pull_request:', 'workflow_dispatch:', 'branches:', '- "v*"')
+    expect(workflow).to include('- "v0.*.*"', '- "v1.0.0.rc*"')
+    expect(workflow).not_to include(*disallowed_triggers)
   end
 
   it 'requires validation before the protected publish job' do
