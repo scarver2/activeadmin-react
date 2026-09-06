@@ -71,7 +71,7 @@ registerComponent("OrdersTable", OrdersTable)
 start()
 ```
 
-`start()` mounts every `[data-react-component]` island, mounts newly rendered pages after `turbo:load`, and unmounts roots before Turbo caches the page. Repeated calls are safe. `stop()` removes the Turbo listeners and unmounts tracked roots. Duplicate component names, unknown components, and malformed JSON props fail loudly.
+`start()` mounts every `[data-react-component]` island, mounts newly rendered pages after `turbo:load`, and unmounts roots before Turbo caches the page. It also unmounts before `turbo:before-render` and remounts after `turbo:render`, covering form validation responses that replace page content without a new Turbo visit. Repeated calls are safe. `stop()` removes the Turbo listeners and unmounts tracked roots. Duplicate component names, unknown components, and malformed JSON props fail loudly.
 
 The shipped modules use package-style relative imports intended for a JavaScript build tool. Copying the directory directly into an importmap or serving it to browsers without a resolver is not currently a supported integration path.
 

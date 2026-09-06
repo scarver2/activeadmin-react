@@ -16,7 +16,15 @@ function mountOnTurboLoad() {
   mountAll()
 }
 
+function mountAfterTurboRender() {
+  mountAll()
+}
+
 function unmountBeforeTurboCache() {
+  unmountAll()
+}
+
+function unmountBeforeTurboRender() {
   unmountAll()
 }
 
@@ -60,6 +68,8 @@ export function start() {
   mountAll()
   document.addEventListener("turbo:load", mountOnTurboLoad)
   document.addEventListener("turbo:before-cache", unmountBeforeTurboCache)
+  document.addEventListener("turbo:before-render", unmountBeforeTurboRender)
+  document.addEventListener("turbo:render", mountAfterTurboRender)
   started = true
 }
 
@@ -69,5 +79,7 @@ export function stop() {
   unmountAll()
   document.removeEventListener("turbo:load", mountOnTurboLoad)
   document.removeEventListener("turbo:before-cache", unmountBeforeTurboCache)
+  document.removeEventListener("turbo:before-render", unmountBeforeTurboRender)
+  document.removeEventListener("turbo:render", mountAfterTurboRender)
   started = false
 }

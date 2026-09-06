@@ -4,6 +4,12 @@
 
 All notable changes to ActiveAdmin React are recorded here. During ordinary pre-1.0 development, PATCH releases contain fixes and small compatible improvements; MINOR releases may contain new capabilities, meaningful API evolution, and documented breaking changes.
 
+## Unreleased
+
+### Fixed
+
+- React islands now unmount before Turbo replaces rendered content and remount after `turbo:render`, including `422` form validation responses.
+
 ## 0.1.0.alpha1 — 2026-09-05
 
 First integrated prerelease for Rodeo dogfooding. Public Ruby and JavaScript contracts
