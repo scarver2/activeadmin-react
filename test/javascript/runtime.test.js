@@ -108,6 +108,21 @@ describe("React runtime", () => {
     await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeTruthy())
   })
 
+  it("unmounts and remounts islands after a Turbo form validation render", async () => {
+    const original = mountNode('{"state":"submitted"}')
+    start()
+    await vi.waitFor(() => expect(original.querySelector("[data-testid=orders]")).toBeTruthy())
+
+    document.dispatchEvent(new Event("turbo:before-render"))
+    await vi.waitFor(() => expect(original.querySelector("[data-testid=orders]")).toBeNull())
+    original.remove()
+
+    const replacement = mountNode('{"state":"submitted"}')
+    document.dispatchEvent(new Event("turbo:render"))
+
+    await vi.waitFor(() => expect(replacement.querySelector("[data-testid=orders]")).toBeTruthy())
+  })
+
   it("does not accumulate lifecycle listeners when started repeatedly", async () => {
     const element = mountNode()
     const addEventListener = vi.spyOn(document, "addEventListener")
@@ -119,6 +134,8 @@ describe("React runtime", () => {
     await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeNull())
     expect(addEventListener.mock.calls.filter(([event]) => event === "turbo:load")).toHaveLength(1)
     expect(addEventListener.mock.calls.filter(([event]) => event === "turbo:before-cache")).toHaveLength(1)
+    expect(addEventListener.mock.calls.filter(([event]) => event === "turbo:before-render")).toHaveLength(1)
+    expect(addEventListener.mock.calls.filter(([event]) => event === "turbo:render")).toHaveLength(1)
   })
 
   it("stops lifecycle listeners and unmounts tracked roots", async () => {
@@ -127,6 +144,7 @@ describe("React runtime", () => {
     stop()
 
     document.dispatchEvent(new Event("turbo:load"))
+    document.dispatchEvent(new Event("turbo:render"))
     await vi.waitFor(() => expect(element.querySelector("[data-testid=orders]")).toBeNull())
   })
 })

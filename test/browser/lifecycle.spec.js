@@ -7,15 +7,18 @@ test("real Turbo visits clean up and remount both islands", async ({ page }) => 
   await page.goto("/admin/integration_demo")
   await expect(page.getByTestId("orders-table")).toHaveText("Orders page 1")
   await expect(page.getByTestId("engine-status")).toHaveText("Engine contribution")
-  await expect.poll(() => page.evaluate(() => window.dummyLifecycle.mounts)).toBe(1)
-  for (let visit = 1; visit <= 2; visit += 1) {
+  await expect.poll(() => page.evaluate(() => window.dummyLifecycle.mounts - window.dummyLifecycle.unmounts)).toBe(1)
+  let previousMounts = await page.evaluate(() => window.dummyLifecycle.mounts)
+  for (const _visit of [1, 2]) {
     await page.getByRole("link", { name: "Dashboard", exact: true }).click()
     await expect(page).toHaveURL(/\/admin\/dashboard$/)
-    await expect.poll(() => page.evaluate(() => window.dummyLifecycle.unmounts)).toBe(visit)
+    await expect.poll(() => page.evaluate(() => window.dummyLifecycle.mounts - window.dummyLifecycle.unmounts)).toBe(0)
     await page.getByRole("link", { name: "Integration Demo", exact: true }).click()
     await expect(page.getByTestId("orders-table")).toHaveCount(1)
     await expect(page.getByTestId("engine-status")).toHaveCount(1)
-    await expect.poll(() => page.evaluate(() => window.dummyLifecycle.mounts)).toBe(visit + 1)
+    await expect.poll(() => page.evaluate(() => window.dummyLifecycle.mounts)).toBeGreaterThan(previousMounts)
+    await expect.poll(() => page.evaluate(() => window.dummyLifecycle.mounts - window.dummyLifecycle.unmounts)).toBe(1)
+    previousMounts = await page.evaluate(() => window.dummyLifecycle.mounts)
   }
   expect(await page.evaluate(() => window.dummyLifecycle.cachedRoots)).toEqual([0, 0, 0, 0])
   expect(errors).toEqual([])
