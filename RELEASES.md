@@ -8,24 +8,33 @@ maturity determine when a release is ready.
 
 ## Pre-1.0 versions
 
-Development uses ordinary `0.MINOR.PATCH` versions, with explicit `0.MINOR.PATCH.alphaN`
-and `0.MINOR.PATCH.betaN` prereleases when authorized. The first integrated prerelease
-is `0.1.0.alpha1`. Prerelease numbers start at 1 and have no leading zeroes.
+Development uses ordinary `0.MINOR.PATCH` versions. The first integrated dogfooding
+prerelease was `0.1.0.alpha1`; subsequent ordinary pre-1.0 development does not use
+`alpha`, `beta`, or `rc` suffixes.
 
-- Increment PATCH for fixes and small backward-compatible improvements.
-- Increment MINOR for new capabilities, meaningful API evolution, and documented breaking
-  changes while the public API remains unstable under Semantic Versioning's `0.y.z` rules.
+- Increment MINOR and reset PATCH to zero for new capabilities, meaningful API evolution,
+  and documented breaking changes while the public API remains unstable under Semantic
+  Versioning's `0.y.z` rules.
+- Increment PATCH within the current MINOR line for fixes and small backward-compatible
+  improvements.
 - Keep Rodeo-specific business behavior outside the gem. Rodeo dogfooding supplies the
   primary evidence for whether generally useful contracts are ready to stabilize.
 - Track ActiveAdmin 4 closely and consider generally useful ActiveAdmin or Arbre fixes for
   upstream contribution instead of permanent private patches.
 
-## Path to 1.0
+## Major-release stabilization
 
-Move to `1.0.0.rc1` only when Rodeo dogfooding indicates that the Ruby API, JavaScript
-adapter protocol, security guidance, packaging, and compatibility policy are ready to
-stabilize. Publish additional candidates as `1.0.0.rcN` when needed, then publish `1.0.0`
-after only release-blocking defects remain.
+Reserve `alphaN`, `betaN`, and `rcN` suffixes for an explicitly authorized major-release
+stabilization train. For the eventual path to `1.0.0`, begin that train only when Rodeo
+dogfooding indicates that the Ruby API, JavaScript adapter protocol, security guidance,
+packaging, and compatibility policy are ready to stabilize. Prerelease numbers start at
+1 and have no leading zeroes. Publish `1.0.0` only after the authorized stabilization
+phases are complete and only release-blocking defects remain.
+
+Authorization of a major-release train includes reviewed updates to the tag guard,
+workflow trigger, and protected `release` environment. The current executable policy
+admits ordinary `v0.MINOR.PATCH` tags and the previously authorized future
+`v1.0.0.rcN` shape; it does not admit suffixed `0.x` tags.
 
 The stable release guarantees an Arbre-native mounting API, deterministic React lifecycle,
 documented React and ActiveAdmin compatibility, Action Cable-friendly asynchronous
@@ -37,8 +46,9 @@ public APIs.
 1. Merge the entire reviewed stack into `master`.
 2. Ensure CI is green at the exact release commit.
 3. Update `ActiveAdmin::React::VERSION` and release notes.
-4. Tag that exact commit with the matching `v0.MINOR.PATCH`, optional `.alphaN` or
-   `.betaN` suffix, or future `v1.0.0.rcN` tag. Numeric components have no leading zeroes.
+4. Tag an ordinary pre-1.0 release as exactly `v0.MINOR.PATCH`. Use `.alphaN`, `.betaN`,
+   or `.rcN` only for an explicitly authorized major-release stabilization train. Numeric
+   components and prerelease counters have no leading zeroes.
 5. Let GitHub Actions publish through RubyGems Trusted Publishing and the `release`
    environment.
 6. Verify the gem is installable and its provenance is visible on RubyGems.org.
