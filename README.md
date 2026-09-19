@@ -102,6 +102,39 @@ end
 
 `ActiveAdmin::React::Contributions.diagnostics` returns entries sorted by namespace, component name, and owner. An installer can query `ActiveAdmin::React::Contributions.registry.registered?("OrdersTable")` before registering inside a reload hook. `ActiveAdmin::React::Contributions.reset!` creates a fresh registry for test isolation. Metadata hashes, arrays, sets, and strings are recursively copied and frozen during registration, so later changes to caller-owned values cannot alter registered state and diagnostics cannot mutate it. Other metadata values must be immutable objects supplied by the contributor.
 
+## Generic resumable Action Cable streams
+
+`subscribeResumable` owns only the common client transport mechanics for an application-owned, monotonically sequenced stream. The server still owns authorization, replay queries, and ordering replay before buffered live delivery:
+
+```js
+import { subscribeResumable } from "active_admin/react"
+
+const cursor = {
+  current: () => latestSequence,
+  advance: (sequence) => { latestSequence = sequence }
+}
+
+const subscription = subscribeResumable({
+  consumer,
+  channel: "AuditEventsChannel",
+  params: { audit_id: auditId },
+  cursor,
+  parse(raw) {
+    const event = parseAuditEvent(raw)
+    return { event, sequence: event.sequence }
+  },
+  onEvent: (event) => applyAuditEvent(event),
+  onStatus: (status, details) => reportConnection(status, details),
+  onProtocolError: (error, raw) => reportMalformedDelivery(error, raw)
+})
+
+return () => subscription.unsubscribe()
+```
+
+Every connection performs the fixed `resume` action with `{ after_sequence: cursor.current() }`. Cursors and parsed sequences must be non-negative safe integers. Duplicate and stale sequences are ignored. A fresh event reaches `onEvent` before the cursor advances, so a failing handler leaves the delivery eligible for replay. Protocol errors throw when `onProtocolError` is omitted. Cleanup is idempotent and unsubscribes only this subscription; shared consumers are never disconnected.
+
+The helper deliberately excludes domain reduction, terminal-state behavior, rendering, retry policy, configurable resume actions, reset/epoch semantics, authorization, and server replay implementation. See the [resumable subscription contract](docs/resumable-subscriptions.md).
+
 ## Asynchronous Action Cable operations
 
 Action Cable transports operation state; application jobs and services own the expensive work. Each event uses a server-owned operation identifier, idempotency key, and monotonic sequence:

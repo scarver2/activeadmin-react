@@ -6,6 +6,10 @@ All notable changes to ActiveAdmin React are recorded here. During ordinary pre-
 
 ## Unreleased
 
+### Added
+
+- `subscribeResumable` now provides fixed resume, monotonic cursor, deduplication, protocol-error, and idempotent cleanup mechanics for application-owned Action Cable streams.
+
 ### Fixed
 
 - React islands now unmount before Turbo replaces rendered content and remount after `turbo:render`, including `422` form validation responses.
