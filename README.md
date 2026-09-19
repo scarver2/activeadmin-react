@@ -102,6 +102,25 @@ end
 
 `ActiveAdmin::React::Contributions.diagnostics` returns entries sorted by namespace, component name, and owner. An installer can query `ActiveAdmin::React::Contributions.registry.registered?("OrdersTable")` before registering inside a reload hook. `ActiveAdmin::React::Contributions.reset!` creates a fresh registry for test isolation. Metadata hashes, arrays, sets, and strings are recursively copied and frozen during registration, so later changes to caller-owned values cannot alter registered state and diagnostics cannot mutate it. Other metadata values must be immutable objects supplied by the contributor.
 
+## Best-effort Action Cable delivery
+
+Persist durable application truth before broadcasting its live projection. `ActiveAdmin::React::Cable.broadcast` contains transport failures and returns an immutable result instead of allowing Action Cable availability to change committed domain state:
+
+```ruby
+result = ActiveAdmin::React::Cable.broadcast(
+  stream: operation.broadcast_key,
+  payload: event.envelope,
+  context: { workflow: "operation", event_id: event.id }
+)
+
+result.success? # true when Action Cable accepted the broadcast
+result.error    # the rescued transport error, or nil
+```
+
+Failures emit `broadcast_failure.active_admin_react` through `ActiveSupport::Notifications` and write one Rails error log. Diagnostics contain the stream, caller-supplied context, and error, but never the payload. Keep context bounded and non-sensitive. Logger and notification-subscriber failures are themselves contained so live delivery cannot become authoritative through observability.
+
+The helper does not provide persistence, transactions, jobs, retries, replay, or domain state. See the [Cable delivery contract](docs/cable-delivery.md) before adopting it.
+
 ## Asynchronous Action Cable operations
 
 Action Cable transports operation state; application jobs and services own the expensive work. Each event uses a server-owned operation identifier, idempotency key, and monotonic sequence:
