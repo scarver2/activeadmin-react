@@ -2,6 +2,19 @@
 
 module ActiveAdmin
   module React
+    module Cable
+      FAILURE_EVENT: String
+
+      class BroadcastResult
+        attr_reader error: StandardError?
+
+        def initialize: (error: StandardError?) -> void
+        def success?: () -> bool
+      end
+
+      def self.broadcast: (stream: String, payload: Hash[String | Symbol, untyped], ?context: Hash[String | Symbol, untyped]) -> BroadcastResult
+    end
+
     class Registry
       class Entry
         attr_reader name: String

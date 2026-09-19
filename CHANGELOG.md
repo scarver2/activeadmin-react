@@ -6,6 +6,10 @@ All notable changes to ActiveAdmin React are recorded here. During ordinary pre-
 
 ## Unreleased
 
+### Added
+
+- `ActiveAdmin::React::Cable.broadcast` now provides an observable, payload-safe best-effort delivery boundary with an immutable `BroadcastResult`.
+
 ### Fixed
 
 - React islands now unmount before Turbo replaces rendered content and remount after `turbo:render`, including `422` form validation responses.
