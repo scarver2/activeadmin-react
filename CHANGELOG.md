@@ -6,13 +6,25 @@ All notable changes to ActiveAdmin React are recorded here. During ordinary pre-
 
 ## Unreleased
 
+## 0.2.0 — 2026-09-19
+
+First ordinary pre-1.0 release after the initial Rodeo dogfooding prerelease. This
+release advances the MINOR line because it adds reusable Action Cable delivery and
+resumable-subscription capabilities alongside compatibility and lifecycle fixes.
+
 ### Added
 
 - `subscribeResumable` now provides fixed resume, monotonic cursor, deduplication, protocol-error, and idempotent cleanup mechanics for application-owned Action Cable streams.
+- `ActiveAdmin::React::Cable.broadcast` now provides an observable, payload-safe best-effort delivery boundary with an immutable `BroadcastResult`.
+
+### Changed
+
+- Ordinary pre-1.0 releases now use unsuffixed `0.MINOR.PATCH` versions; prerelease suffixes are reserved for explicitly authorized major-release stabilization trains.
 
 ### Fixed
 
 - React islands now unmount before Turbo replaces rendered content and remount after `turbo:render`, including `422` form validation responses.
+- Rails 8.1.3.1 integration and browser validation now constrain the test-only JSON dependency below 3 until Rails supports JSON 3 keyword arguments.
 
 ## 0.1.0.alpha1 — 2026-09-05
 

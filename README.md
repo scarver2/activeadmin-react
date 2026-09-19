@@ -11,7 +11,7 @@ ActiveAdmin React keeps administrative pages Rails-first and server-rendered whi
 Add the gem to a Rails application that uses ActiveAdmin:
 
 ```ruby
-gem "activeadmin-react", "0.1.0.alpha1", require: "active_admin/react"
+gem "activeadmin-react", "0.2.0", require: "active_admin/react"
 ```
 
 Then run `bundle install`. The gem requires Ruby 3.2 or newer, Rails 8.x, and ActiveAdmin `4.0.0.beta22` or newer within the 4.x line. The JavaScript runtime uses the React 18/19 `createRoot` API; the host supplies `react` and `react-dom` and remains responsible for compiling and serving browser assets.
@@ -134,6 +134,25 @@ return () => subscription.unsubscribe()
 Every connection performs the fixed `resume` action with `{ after_sequence: cursor.current() }`. Cursors and parsed sequences must be non-negative safe integers. Duplicate and stale sequences are ignored. A fresh event reaches `onEvent` before the cursor advances, so a failing handler leaves the delivery eligible for replay. Protocol errors throw when `onProtocolError` is omitted. Cleanup is idempotent and unsubscribes only this subscription; shared consumers are never disconnected.
 
 The helper deliberately excludes domain reduction, terminal-state behavior, rendering, retry policy, configurable resume actions, reset/epoch semantics, authorization, and server replay implementation. See the [resumable subscription contract](docs/resumable-subscriptions.md).
+
+## Best-effort Action Cable delivery
+
+Persist durable application truth before broadcasting its live projection. `ActiveAdmin::React::Cable.broadcast` contains transport failures and returns an immutable result instead of allowing Action Cable availability to change committed domain state:
+
+```ruby
+result = ActiveAdmin::React::Cable.broadcast(
+  stream: operation.broadcast_key,
+  payload: event.envelope,
+  context: { workflow: "operation", event_id: event.id }
+)
+
+result.success? # true when Action Cable accepted the broadcast
+result.error    # the rescued transport error, or nil
+```
+
+Failures emit `broadcast_failure.active_admin_react` through `ActiveSupport::Notifications` and write one Rails error log. Diagnostics contain the stream, caller-supplied context, and error, but never the payload. Keep context bounded and non-sensitive. Logger and notification-subscriber failures are themselves contained so live delivery cannot become authoritative through observability.
+
+The helper does not provide persistence, transactions, jobs, retries, replay, or domain state. See the [Cable delivery contract](docs/cable-delivery.md) before adopting it.
 
 ## Asynchronous Action Cable operations
 
