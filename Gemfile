@@ -17,6 +17,8 @@ end
 group :test do
   gem 'capybara', '~> 3.40', require: false
   gem 'fakefs', '~> 3.0', require: false
+  # Rails 8.1.3.1 still passes JSON.parse options positionally; remove after Rails supports JSON 3 keywords.
+  gem 'json', '< 3', require: false
   gem 'puma', '~> 6.0', require: false
   gem 'rspec', '~> 3.13', require: false
   gem 'simplecov', '~> 0.22', require: false
