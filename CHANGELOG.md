@@ -9,6 +9,7 @@ All notable changes to ActiveAdmin React are recorded here. During ordinary pre-
 ### Added
 
 - `subscribeResumable` now provides fixed resume, monotonic cursor, deduplication, protocol-error, and idempotent cleanup mechanics for application-owned Action Cable streams.
+- `ActiveAdmin::React::Cable.broadcast` now provides an observable, payload-safe best-effort delivery boundary with an immutable `BroadcastResult`.
 
 ### Fixed
 
