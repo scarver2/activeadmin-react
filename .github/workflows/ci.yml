@@ -42,7 +42,7 @@ jobs:
           node-version: 24.20.0
           cache: npm
       - run: npm ci
-      - run: npm run test:js
+      - run: npm test
 
   browser:
     name: Chromium dummy host

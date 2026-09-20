@@ -3,6 +3,7 @@
 # Documentation
 
 - [Project README](../README.md) — installation, compatibility, public APIs, supported asset integration, security, development, and troubleshooting.
+- [TypeScript consumer contract](typescript.md) — declaration discovery, public type coverage, and strict consumer verification.
 - [Resumable subscription contract](resumable-subscriptions.md) — generic Action Cable resume, cursor, protocol-error, and ownership semantics.
 - [Cable delivery contract](cable-delivery.md) — best-effort broadcast semantics, diagnostics, privacy, and host ownership.
 - [Release process](releasing.md) — maintainer validation, RubyGems Trusted Publishing, failure handling, and post-release verification.

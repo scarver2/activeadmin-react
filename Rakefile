@@ -9,7 +9,7 @@ RuboCop::RakeTask.new(:rubocop)
 
 desc 'Run JavaScript tests and coverage'
 task :js do
-  sh 'npm run test:js'
+  sh 'npm test'
 end
 
 desc 'Validate public RBS signatures'
