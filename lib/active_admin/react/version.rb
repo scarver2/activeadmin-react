@@ -3,6 +3,6 @@
 
 module ActiveAdmin
   module React
-    VERSION = '0.2.0'
+    VERSION = '0.3.0'
   end
 end

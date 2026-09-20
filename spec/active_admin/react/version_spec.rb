@@ -22,7 +22,7 @@ RSpec.describe ActiveAdmin::React::VERSION do
   it 'uses the authorized ordinary pre-1.0 minor version' do
     parsed_version = Gem::Version.new(version)
 
-    expect(version).to eq('0.2.0')
+    expect(version).to eq('0.3.0')
     expect(parsed_version).not_to be_prerelease
   end
 end

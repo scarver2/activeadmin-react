@@ -11,7 +11,7 @@ ActiveAdmin React keeps administrative pages Rails-first and server-rendered whi
 Add the gem to a Rails application that uses ActiveAdmin:
 
 ```ruby
-gem "activeadmin-react", "0.2.0", require: "active_admin/react"
+gem "activeadmin-react", "0.3.0", require: "active_admin/react"
 ```
 
 Then run `bundle install`. The gem requires Ruby 3.2 or newer, Rails 8.x, and ActiveAdmin `4.0.0.beta22` or newer within the 4.x line. The JavaScript runtime uses the React 18/19 `createRoot` API; the host supplies `react` and `react-dom` and remains responsible for compiling and serving browser assets.
@@ -41,7 +41,7 @@ The mount owns the `data-react-component` and `data-react-props` attributes. Oth
 
 ## Register and start components
 
-The packaged JavaScript entrypoint is `app/javascript/active_admin/react/index.js`. Configure the host's Vite, esbuild, or equivalent resolver so `active_admin/react` points to that file inside the installed gem. For example, Vite can derive the gem root with `bundle show activeadmin-react`:
+The packaged JavaScript entrypoint is `app/javascript/active_admin/react/index.js`. Its sibling `index.d.ts` describes every public registry, runtime, protocol, Cable, and operation export. Configure the host's Vite, esbuild, or equivalent resolver so `active_admin/react` points to that file inside the installed gem. For example, Vite can derive the gem root with `bundle show activeadmin-react`:
 
 ```js
 import { execFileSync } from "node:child_process"
@@ -60,6 +60,29 @@ export default defineConfig({
   }
 })
 ```
+
+TypeScript must resolve the same import to the containing directory so it discovers
+`index.d.ts`; do not maintain a host-owned ambient declaration. For a vendored or
+otherwise stable gem path, add a compiler path such as:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "active_admin/react": [
+        "vendor/bundle/ruby/4.0.0/gems/activeadmin-react-0.3.0/app/javascript/active_admin/react"
+      ]
+    }
+  }
+}
+```
+
+Generate or update that path from `bundle show activeadmin-react` when the bundle
+location changes. The declarations reference the official React types, so TypeScript
+hosts provide versions of `@types/react` and `@types/react-dom` matching their React
+runtime. See the [TypeScript consumer contract](docs/typescript.md) for the supported
+types and an independent strict-mode verification pattern.
 
 Register every component before starting the runtime:
 

@@ -1,0 +1,5 @@
+// test/typescript/tsconfig.invalid.json
+{
+  "extends": "./tsconfig.json",
+  "files": ["invalid.ts"]
+}

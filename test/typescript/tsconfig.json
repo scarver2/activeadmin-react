@@ -1,0 +1,15 @@
+// test/typescript/tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": "../..",
+    "lib": ["DOM", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "paths": {
+      "active_admin/react": ["app/javascript/active_admin/react"]
+    },
+    "skipLibCheck": false,
+    "strict": true
+  }
+}

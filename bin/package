@@ -26,7 +26,7 @@ if [[ -n "$MISE_BIN" ]]; then
 else
   ruby_bin="$(command -v ruby)"
 fi
-check_command='require "rails/all"; require "active_admin/react"; spec = Gem.loaded_specs.fetch("activeadmin-react"); expected_home = File.realpath(ENV.fetch("GEM_HOME")); loaded_path = File.realpath(spec.full_gem_path); abort "version mismatch" unless ActiveAdmin::React::VERSION == ENV.fetch("EXPECTED_VERSION"); abort "gem loaded outside isolated GEM_HOME" unless loaded_path.start_with?(expected_home + File::SEPARATOR); puts "Loaded activeadmin-react #{ActiveAdmin::React::VERSION} from #{loaded_path}"'
+check_command='require "rails/all"; require "active_admin/react"; spec = Gem.loaded_specs.fetch("activeadmin-react"); expected_home = File.realpath(ENV.fetch("GEM_HOME")); loaded_path = File.realpath(spec.full_gem_path); declaration_path = File.join(loaded_path, "app/javascript/active_admin/react/index.d.ts"); abort "version mismatch" unless ActiveAdmin::React::VERSION == ENV.fetch("EXPECTED_VERSION"); abort "gem loaded outside isolated GEM_HOME" unless loaded_path.start_with?(expected_home + File::SEPARATOR); abort "installed TypeScript declarations missing" unless File.file?(declaration_path); puts "Loaded activeadmin-react #{ActiveAdmin::React::VERSION} from #{loaded_path} with TypeScript declarations"'
 GEM_HOME="$install_dir/gems" GEM_PATH="$install_dir/gems" EXPECTED_VERSION="$version" \
   "$ruby_bin" -e "$check_command"
 

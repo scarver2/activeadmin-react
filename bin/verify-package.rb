@@ -20,11 +20,13 @@ expected_files = Dir.glob(public_globs, base: root).select do |file|
   File.file?(File.join(root, file))
 end.sort
 packaged_files = Gem::Package.new(package_file).contents.sort
+declaration_file = 'app/javascript/active_admin/react/index.d.ts'
 
 missing_files = expected_files - packaged_files
 unexpected_files = packaged_files - expected_files
 
 abort "Missing packaged files: #{missing_files.join(', ')}" unless missing_files.empty?
 abort "Unexpected packaged files: #{unexpected_files.join(', ')}" unless unexpected_files.empty?
+abort "Missing packaged TypeScript declarations: #{declaration_file}" unless packaged_files.include?(declaration_file)
 
 puts "Verified #{packaged_files.length} packaged files"

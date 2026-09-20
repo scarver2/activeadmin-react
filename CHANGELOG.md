@@ -6,6 +6,18 @@ All notable changes to ActiveAdmin React are recorded here. During ordinary pre-
 
 ## Unreleased
 
+## 0.3.0 — 2026-09-19
+
+This release advances the MINOR line because it adds a public TypeScript contract for
+the packaged JavaScript API without changing runtime behavior.
+
+### Added
+
+- Packaged `index.d.ts` declarations now cover every public registry, runtime,
+  protocol, Cable, resumable-subscription, and operation export.
+- Strict independent-consumer verification now proves supported usage typechecks and
+  representative invalid usage fails without a host-owned ambient declaration.
+
 ## 0.2.0 — 2026-09-19
 
 First ordinary pre-1.0 release after the initial Rodeo dogfooding prerelease. This
