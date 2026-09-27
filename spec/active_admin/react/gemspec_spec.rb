@@ -33,8 +33,8 @@ RSpec.describe 'activeadmin-react.gemspec' do
   it 'declares supported Ruby, Rails, and ActiveAdmin bounds' do
     dependencies = gemspec.runtime_dependencies.to_h { |dependency| [dependency.name, dependency.requirement.to_s] }
 
-    expect(gemspec.required_ruby_version.to_s).to eq('>= 3.2')
-    expect(dependencies).to eq('activeadmin' => '>= 4.0.0.beta22, < 5', 'rails' => '>= 8.0, < 9')
+    expect(gemspec.required_ruby_version.to_s).to eq('>= 3.3')
+    expect(dependencies).to eq('activeadmin' => '>= 4.0.0.beta23, < 5', 'rails' => '>= 8.0, < 9')
   end
 
   it 'publishes immutable release metadata' do

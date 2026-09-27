@@ -14,7 +14,7 @@ Add the gem to a Rails application that uses ActiveAdmin:
 gem "activeadmin-react", "0.3.0", require: "active_admin/react"
 ```
 
-Then run `bundle install`. The gem requires Ruby 3.2 or newer, Rails 8.x, and ActiveAdmin `4.0.0.beta22` or newer within the 4.x line. The JavaScript runtime uses the React 18/19 `createRoot` API; the host supplies `react` and `react-dom` and remains responsible for compiling and serving browser assets.
+Then run `bundle install`. The gem requires Ruby 3.3 or newer, Rails 8.x, and ActiveAdmin `4.0.0.beta23` or newer within the 4.x line. The JavaScript runtime uses the React 18/19 `createRoot` API; the host supplies `react` and `react-dom` and remains responsible for compiling and serving browser assets.
 
 ## Render an island from Arbre
 

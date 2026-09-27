@@ -18,6 +18,11 @@ the packaged JavaScript API without changing runtime behavior.
 - Strict independent-consumer verification now proves supported usage typechecks and
   representative invalid usage fails without a host-owned ambient declaration.
 
+### Changed
+
+- The minimum supported ActiveAdmin version is now `4.0.0.beta23`, which raises
+  the minimum supported Ruby version to 3.3.
+
 ## 0.2.0 — 2026-09-19
 
 First ordinary pre-1.0 release after the initial Rodeo dogfooding prerelease. This
