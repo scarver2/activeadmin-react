@@ -20,7 +20,8 @@ the packaged JavaScript API without changing runtime behavior.
 
 ### Changed
 
-- The minimum supported ActiveAdmin version is now `4.0.0.beta23`.
+- The minimum supported ActiveAdmin version is now `4.0.0.beta23`, which raises
+  the minimum supported Ruby version to 3.3.
 
 ## 0.2.0 — 2026-09-19
 

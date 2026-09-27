@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   DESCRIPTION
   spec.homepage = 'https://github.com/scarver2/activeadmin-react'
   spec.license = 'MIT'
-  spec.required_ruby_version = '>= 3.2'
+  spec.required_ruby_version = '>= 3.3'
 
   public_files = Dir[
     'app/javascript/**/*',
