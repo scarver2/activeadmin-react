@@ -27,7 +27,7 @@ Gem::Specification.new do |spec|
   spec.files = public_files.select { |file| File.file?(file) }.sort
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'activeadmin', '>= 4.0.0.beta22', '< 5'
+  spec.add_dependency 'activeadmin', '>= 4.0.0.beta23', '< 5'
   spec.add_dependency 'rails', '>= 8.0', '< 9'
   release_blob_uri = "#{spec.homepage}/blob/v#{spec.version}"
   spec.metadata['bug_tracker_uri'] = 'https://github.com/scarver2/activeadmin-react/issues'
